@@ -17,9 +17,12 @@ class Application {
     }
 
     start() {
+        var self = this;
         return Promise.resolve().then(function () {
-            return this.connectDatabase();
-        }.bind(this))
+            return self.connectDatabase();
+        }).then(function (db) {
+            self.db = db;
+        })
     }
 
     connectDatabase() {

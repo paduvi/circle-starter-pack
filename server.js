@@ -5,4 +5,4 @@ var Application = require('./utilities/Application');
 
 var app = new Application();
 
-app.start();
+app.start()
