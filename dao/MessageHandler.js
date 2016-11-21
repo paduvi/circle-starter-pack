@@ -4,6 +4,9 @@
 
 class MessageHandler {
 
+    constructor(application) {
+        this.app = application;
+    }
 
     /**
      * Send response back to Message Queue to update Event's status
