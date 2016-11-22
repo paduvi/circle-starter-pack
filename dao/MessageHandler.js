@@ -14,7 +14,7 @@ class MessageHandler {
      * @param eventID
      */
     responseSuccess(eventID) {
-        console.log("vao day rui:" + eventID);
+        console.log("vao day rui: " + eventID);
     }
 
     createPayroll(payroll) {
@@ -44,7 +44,6 @@ class MessageHandler {
 
         return Promise.resolve().then(function () {
             //check duplicate here
-
             let col = self.app.db.collection('payroll');
             return col.find(query).toArray();
         });

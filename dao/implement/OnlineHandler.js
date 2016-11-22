@@ -15,21 +15,23 @@ class OnlineHandler extends CourseHandler {
         // Gửi thông báo cho MQ rằng đã xử lý xong
         var self = this;
 
-        if (!this.checkValidPayload(event.payload, ['video_id', 'register_id', 'type', 'trainer_id']))
-            return console.log("Payload khong dung format");
-        this.checkExistPayroll(event.payload, ['video_id', 'register_id', 'type'])
+        if (!this.checkValidPayload(event.payload, ['video_id', 'register_id', 'type', 'user_id']))
+            return console.log("Invalid format video payload");
+
+        this.checkExistPayroll(event.payload, ['video_id', 'register_id', 'type', 'user_id'])
             .then(function (checkExist) {
                 if (checkExist && checkExist.length) {
+                    console.log("DUPLICATE");
                     return self.responseSuccess(event.id);
                 }
 
                 let payRoll = {
-                    user_id: event.payload.trainer_id,
+                    user_id: event.payload.user_id,
                     revenue: 5000,
                     video_id: event.payload.video_id,
                     register_id: event.payload.register_id,
                     type: event.payload.type
-                }
+                };
 
                 return self.createPayroll(payRoll).then(function (result) {
                     if (result.result.ok === 1) {
@@ -40,7 +42,6 @@ class OnlineHandler extends CourseHandler {
             .catch(function (error) {
                 console.error(error);
             });
-
     }
 
     /**
@@ -51,6 +52,37 @@ class OnlineHandler extends CourseHandler {
         // Kiểm tra bản ghi duplicate
         // Nếu ok thì xử lý truy vấn rồi tạo bản ghi Payroll +5,000VND
         // Gửi thông báo cho MQ rằng đã xử lý xong
+        let self = this;
+
+        if (!this.checkValidPayload(event.payload, ['quiz_id', 'user_id', 'register_id', 'type'])) {
+            return console.log('Invalid format quiz payload');
+        }
+
+        this.checkExistPayroll(event.payload, ['quiz_id', 'register_id', 'type', 'user_id'])
+            .then(function (checkExist) {
+                if (checkExist && checkExist.length) {
+                    console.log("DUPLICATE");
+                    return self.responseSuccess(event.id);
+                }
+
+                let payRoll = {
+                    user_id: event.payload.user_id,
+                    revenue: 5000,
+                    quiz_id: event.payload.quiz_id,
+                    register_id: event.payload.register_id,
+                    type: event.payload.type
+                };
+
+                //Create payroll and announce to event_log
+                return self.createPayroll(payRoll).then(function (result) {
+                    if (result.result.ok === 1) {
+                        return self.responseSuccess(event.id);
+                    }
+                })
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
     }
 
     /**
@@ -85,6 +117,37 @@ class OnlineHandler extends CourseHandler {
         // Kiểm tra bản ghi duplicate
         // Nếu ok thì xử lý truy vấn rồi tạo bản ghi Payroll +20,000VND
         // Gửi thông báo cho MQ rằng đã xử lý xong
+        let self = this;
+
+        if(!this.checkValidPayload(event.payload, ['lesson_id', 'register_id', 'user_id', 'type'])) {
+            return console.log('Invalid format homework mark payload');
+        }
+
+        this.checkExistPayroll(event.payload, ['lesson_id', 'register_id', 'user_id', 'type'])
+            .then(function (checkExist) {
+                if(checkExist && checkExist.length) {
+                    console.log("DUPLICATE");
+                    return self.responseSuccess(event.id);
+                }
+
+                let payRoll = {
+                    user_id: event.payload.user_id,
+                    revenue: 20000,
+                    lesson_id: event.payload.lesson_id,
+                    register_id: event.payload.register_id,
+                    type: event.payload.type
+                }
+
+                return self.createPayroll(payRoll)
+                    .then(function (result) {
+                        if(result.result.ok === 1) {
+                            return self.responseSuccess(event.id);
+                        }
+                    });
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
     }
 
     /**
@@ -95,6 +158,37 @@ class OnlineHandler extends CourseHandler {
         // Kiểm tra bản ghi duplicate
         // Nếu ok thì xử lý truy vấn rồi tạo bản ghi Payroll +20,000VND
         // Gửi thông báo cho MQ rằng đã xử lý xong
+        var self = this;
+
+        if (!this.checkValidPayload(event.payload, ['comment_id', 'register_id', 'user_id', 'type']))
+            return console.log("Invalid format discuss payload");
+
+        this.checkExistPayroll(event.payload, ['comment_id', 'register_id', 'type', 'user_id'])
+            .then(function (checkExist) {
+
+                console.log(checkExist);
+                if (checkExist && checkExist.length) {
+                    console.log("DUPLICATE");
+                    return self.responseSuccess(event.id);
+                }
+
+                let payRoll = {
+                    user_id: event.payload.user_id,
+                    revenue: 20000,
+                    comment_id: event.payload.comment_id,
+                    register_id: event.payload.register_id,
+                    type: event.payload.type
+                };
+
+                return self.createPayroll(payRoll).then(function (result) {
+                    if (result.result.ok === 1) {
+                        return self.responseSuccess(event.id);
+                    }
+                })
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
     }
 
     /**
