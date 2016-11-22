@@ -16,18 +16,18 @@ return Promise.resolve().then(function () {
     let onlineHandler = new OnlineHandler(app);
 
     var event = {
-        id: 1,
+        id: 94,
         from: 'online-course',
         to: 'payroll',
         status: 0,
         create_at: Date.now(),
-        created_by: 3277,
+        created_by: 4869,
         payload: {
-            video_id: 3,
-            register_id: 4,
-            trainer_id: 2504,
-            type: 'complete_video'
+            comment_id: 239,
+            register_id: 56,
+            user_id: 2,
+            type: 'discuss'
         }
     };
-    onlineHandler.handleVideoComplete(event);
-})
+    onlineHandler.handleDiscuss(event);
+});
