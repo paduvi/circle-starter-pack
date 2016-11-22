@@ -14,7 +14,7 @@ class MessageHandler {
      * @param eventID
      */
     responseSuccess(eventID) {
-        console.log("vao day rui");
+        console.log("vao day rui:" + eventID);
     }
 
     createPayroll(payroll) {
@@ -27,14 +27,14 @@ class MessageHandler {
                 throw new Error('no revenue');
             }
             let col = self.app.db.collection('payroll');
-            return col.insertOne(payroll);
+            return col.insertOne(Object.assign(payroll, {created_at: Date.now()}));
         });
     }
 
-    checkExistPayroll(payload, ...attr) {
+    checkExistPayroll(payload, attr) {
         let self = this;
         let query = {};
-        if (attr){
+        if (attr) {
             attr.forEach(function (key) {
                 query[key] = payload[key];
             })
@@ -45,10 +45,17 @@ class MessageHandler {
         return Promise.resolve().then(function () {
             //check duplicate here
 
-
             let col = self.app.db.collection('payroll');
             return col.find(query).toArray();
         });
+    }
+
+    checkValidPayload(payload, attr) {
+        for (let key of attr) {
+            if (!payload.hasOwnProperty(key))
+                return false;
+        }
+        return true;
     }
 }
 
