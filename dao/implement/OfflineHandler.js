@@ -14,6 +14,7 @@ class OfflineHandler extends CourseHandler {
         // Nếu ok thì tạo Payroll
         // Nếu trùng lặp nhưng khác nhau số lượng học viên điểm danh thì tạo Payroll cộng/trừ
         // Gửi thông báo cho MQ rằng đã xử lý xong
+
     }
 
 }
