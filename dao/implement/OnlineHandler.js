@@ -10,21 +10,22 @@ class OnlineHandler extends CourseHandler {
      * @param event
      */
     handleVideoComplete(event) {
-        // Kiểm tra bản ghi duplicate
-        // Nếu ok thì xử lý truy vấn rồi tạo bản ghi Payroll +5,000VND
-        // Gửi thông báo cho MQ rằng đã xử lý xong
+
         var self = this;
 
+        /* check format của payload */
         if (!this.checkValidPayload(event.payload, ['video_id', 'register_id', 'type', 'user_id']))
             return console.log("Invalid format video payload");
 
+        /* Kiểm tra bản ghi duplicate */
         this.checkExistPayroll(event.payload, ['video_id', 'register_id', 'type', 'user_id'])
             .then(function (checkExist) {
                 if (checkExist && checkExist.length) {
                     console.log("DUPLICATE");
-                    return self.responseSuccess(event.id);
+                    return self.responseSuccess(event.id); // Gửi thông báo cho MQ rằng đã xử lý xong
                 }
 
+                /* tạo bản ghi Payroll +5,000VND */
                 let payRoll = {
                     user_id: event.payload.user_id,
                     revenue: 5000,
@@ -35,7 +36,7 @@ class OnlineHandler extends CourseHandler {
 
                 return self.createPayroll(payRoll).then(function (result) {
                     if (result.result.ok === 1) {
-                        return self.responseSuccess(event.id);
+                        return self.responseSuccess(event.id); // Gửi thông báo cho MQ rằng đã xử lý xong
                     }
                 })
             })
