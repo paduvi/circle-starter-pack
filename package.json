@@ -6,10 +6,12 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "express": "^4.14.0",
+    "faker": "^3.1.0",
     "glob": "^7.1.1",
     "glob-promise": "^2.0.0",
     "mongodb": "^2.2.11",
     "path": "^0.12.7",
+    "sequelize": "^3.27.0",
     "zmq": "^2.15.3"
   },
   "devDependencies": {},

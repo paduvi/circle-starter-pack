@@ -11,11 +11,30 @@ var http = require('http');
 var express = require('express');
 
 class Application {
-    constructor() {
+    constructor(opts) {
+
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
         global.__base = path.join(__dirname, "..");
 
         var app = express();
+
+        // Swagger document loader
+        if (opts && opts.enableSwagger) {
+
+            if (process.env.NODE_ENV === 'development') {
+                app.set('view cache', false);
+                app.enable('verbose errors');
+                app.set("showStackError", true);
+            } else {
+                app.locals.cache = 'memory';
+                app.disabled('verbose errors');
+                app.set('trust proxy', 1);
+            }
+
+            app.enable('trust proxy');
+            app.use(express.static(__base + '/public', {maxAge: 3600}));
+        }
+
         Object.assign(this, app);
         this.expressApp = function (req, res, next) {
             this.handle(req, res, next);

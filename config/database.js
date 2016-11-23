@@ -1,7 +1,11 @@
 /**
  * Created by chotoxautinh on 11/12/16.
  */
+
+"use strict";
+
 var MongoClient = require('mongodb').MongoClient;
+var Sequelize = require('sequelize');
 var Promise = require('bluebird');
 
 module.exports = function (app) {
@@ -29,6 +33,7 @@ function connectMongo(app) {
 function connectPostgres(app) {
     return Promise.resolve().then(function () {
         // Dùng Sequelize;
+        // let sequelize = new Sequelize(app.config.db.postgres.database, app.config.db.postgres.username, app.config.db.postgres.password);
         return {}
     })
 }

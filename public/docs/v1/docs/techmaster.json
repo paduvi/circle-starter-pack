@@ -1,0 +1,110 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Techmaster PayRoll API",
+    "description": "Danh sách API trên hệ thống Techmaster PayRoll ",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8000",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api",
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/online-course/complete-video": {
+      "get": {
+        "summary": "Khóa học online",
+        "description": "Hoàn thành khóa học",
+        "tags": [
+          "COURSE_ONLINE"
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile information for a user",
+            "schema": {
+              "$ref": "#/definitions/DefaultObject"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "DefaultArray": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "default": "200"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "description": "Giá trị trả về là Mảng"
+        }
+      }
+    },
+    "DefaultBoolean": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "default": "200"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "boolean",
+          "description": "Giá trị trả về kiểu Boolean"
+        }
+      }
+    },
+    "DefaultObject": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "default": "200"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "default": "200"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "description": "Object|String|String"
+        }
+      }
+    }
+  }
+}

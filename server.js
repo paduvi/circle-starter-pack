@@ -3,6 +3,8 @@
  */
 var Application = require('./utilities/Application');
 
-var app = new Application();
+var app = new Application({
+    enableSwagger: true
+});
 
-app.start()
+app.start();
