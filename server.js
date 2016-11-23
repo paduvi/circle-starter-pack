@@ -4,8 +4,6 @@
 process.env.NODE_ENV = 'production';
 var Application = require('./utilities/Application');
 
-var app = new Application({
-    enableSwagger: true
-});
+var app = new Application();
 
 app.start();

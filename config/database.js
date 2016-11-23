@@ -18,7 +18,7 @@ module.exports = function (app) {
             postgres: results[1]
         }
     })
-}
+};
 
 function connectMongo(app) {
     return new Promise(function (resolve, reject) {

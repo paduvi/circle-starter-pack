@@ -2,6 +2,8 @@
  * Created by chotoxautinh on 11/23/16.
  */
 module.exports = {
+
+    enableSwagger: true,
     db: {
         mongo: {
             host: "localhost",
@@ -13,7 +15,7 @@ module.exports = {
             port: '5432',
             database: 'payroll',
             username: 'postgres',
-            password: '',
+            password: '2312312312',
             dialect: 'postgres',
             logging: false
         }
@@ -26,4 +28,4 @@ module.exports = {
         port: 8000,
         prefix: '/api'
     }
-}
+};
