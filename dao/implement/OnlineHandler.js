@@ -14,7 +14,7 @@ class OnlineHandler extends CourseHandler {
         var self = this;
 
         /* check format của payload */
-        if (!this.checkValidPayload(event.payload, ['video_id', 'register_id', 'type', 'trainer_id']))
+        if (!this.checkValidPayload(event.payload, ['video_id', 'register_id', 'type', 'user_id']))
             return console.log("Payload khong dung format");
 
         /* Kiểm tra bản ghi duplicate */
