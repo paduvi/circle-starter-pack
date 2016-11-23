@@ -9,7 +9,7 @@ var glob = require('glob-promise');
 var zmq = require('zmq');
 var http = require('http');
 var express = require('express');
-var cors = require('cors');
+var ipUtil = require('./ipUtils');
 
 class Application {
     constructor() {
@@ -136,11 +136,11 @@ class Application {
             return Promise.map(files, function (filePath) {
                 let controllerName = path.dirname(filePath).split("/").pop();
                 let content = require(filePath)(self);
-                Object.keys(content).forEach(function (route) {
+                return Promise.map(Object.keys(content), function (route) {
                     if (!route.startsWith("/"))
                         route = "/" + route;
                     let prefix = self.setting.web.prefix || '';
-                    self.loadWebRoute(prefix + "/" + controllerName + route, content[route]);
+                    return self.loadWebRoute(prefix + "/" + controllerName + route, content[route]);
                 })
             });
         });
@@ -148,13 +148,32 @@ class Application {
 
     loadWebRoute(route, handlers) {
         var self = this;
-        Object.keys(handlers).forEach(function (method) {
+        return Promise.map(Object.keys(handlers), function (method) {
             let middleware = handlers[method].middleware;
             let handler = handlers[method].handler;
-            if (handlers[method].cors && process.env.NODE_ENV != 'development') {
-                middleware.unshift(cors({origin: handlers[method].cors}));
+            let cors = handlers[method].cors;
+            if (cors && process.env.NODE_ENV != 'development') {
+                let filter = function (req, res, next) {
+                    let ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
+                    if (cors.constructor === Array) {
+                        return Promise.map(cors, function (allow_origin) {
+                            return ipUtil.isAllowed(ip, allow_origin);
+                        }).then(function (results) {
+                            if (~results.indexOf(true))
+                                return next();
+                            return res.sendStatus(403);
+                        });
+                    }
+                    return ipUtil.isAllowed(ip, cors).then(function (result) {
+                        if (result)
+                            return next()
+                        return res.sendStatus(403);
+                    })
+                }
+                middleware.unshift(filter);
             }
             self[method].call(self, route, ...middleware, handler);
+            return;
         })
     }
 }

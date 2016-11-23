@@ -8,7 +8,7 @@ module.exports = function (application) {
             get: {
                 handler: online.completeVideo,
                 middleware: [], // optional
-                cors: [] //optional
+                cors: "14.177.9.185" //optional
             }
         }
     }

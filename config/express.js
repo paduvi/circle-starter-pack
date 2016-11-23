@@ -3,9 +3,12 @@
  */
 var helmet = require('helmet');
 var bodyParser  = require('body-parser');
+var methodOverride = require('method-override');
 
 module.exports = function (app) {
     app.use(helmet());
+
+    app.use(methodOverride());
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
