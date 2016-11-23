@@ -9,6 +9,7 @@ var glob = require('glob-promise');
 var zmq = require('zmq');
 var http = require('http');
 var express = require('express');
+var cors = require('cors');
 
 class Application {
     constructor() {
@@ -22,16 +23,33 @@ class Application {
         }.bind(this);
 
         this.getGlobalConfig();
+        this.getGlobalSetting();
+        this.useExpressSetting();
     }
 
     getGlobalConfig() {
         this.config = require(__base + "/config/config.js");
         try {
-            fs.accessSync(`${__base}/config/env/${process.env.NODE_ENV}.js`, fs.F_OK);
-            Object.assign(this.config, require(`${__base}/config/env/${process.env.NODE_ENV}.js`));
+            fs.accessSync(`${__base}/config/env/config-${process.env.NODE_ENV}.js`, fs.F_OK);
+            Object.assign(this.config, require(`${__base}/config/env/config-${process.env.NODE_ENV}.js`));
         } catch (e) {
             // It isn't accessible
         }
+    }
+
+    getGlobalSetting() {
+        this.setting = require(__base + "/config/setting.js");
+        try {
+            fs.accessSync(`${__base}/config/env/setting-${process.env.NODE_ENV}.js`, fs.F_OK);
+            Object.assign(this.setting, require(`${__base}/config/env/setting-${process.env.NODE_ENV}.js`));
+        } catch (e) {
+            // It isn't accessible
+        }
+    }
+
+    useExpressSetting() {
+        let expressFunction = require(`${__base}/config/express.js`);
+        expressFunction(this);
     }
 
     start() {
@@ -43,7 +61,7 @@ class Application {
             self.sub = zmq.socket('sub'); // create subscriber endpoint
             return self.loadMessageRoutes();
         }).then(function () {
-            let prefix = self.config.zmq.sub_prefix;
+            let prefix = self.setting.zmq.sub_prefix;
             self.sub.subscribe(prefix);
             self.sub.on('message', function (data) {
                 data = data.toString("utf8");
@@ -63,6 +81,7 @@ class Application {
                     return console.error(err);
                 }
             });
+            return;
         }).then(function () {
             return self.loadWebController();
         }).then(function () {
@@ -70,14 +89,15 @@ class Application {
         }).then(function (server) {
             self.httpServer = server;
 
-            server.listen(self.config.web.port, () => {
+            server.listen(self.setting.web.port, () => {
                 console.log('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
-                console.log('Application started on port ' + self.config.web.port, ', Process ID: ' + process.pid);
+                console.log('Application started on port ' + self.setting.web.port, ', Process ID: ' + process.pid);
             });
 
             // connect to publisher
-            self.sub.connect(self.config.zmq.pub_address);
-            console.log(`Connected to zmq publisher at ${self.config.zmq.pub_address}.`);
+            self.sub.connect(self.setting.zmq.pub_address);
+            console.log(`Connected to zmq publisher at ${self.setting.zmq.pub_address}.`);
+            return;
         }).catch(function (err) {
             console.error(err)
         });
@@ -116,7 +136,8 @@ class Application {
                 Object.keys(content).forEach(function (route) {
                     if (!route.startsWith("/"))
                         route = "/" + route;
-                    self.loadWebRoute(self.config.web.prefix + "/" + controllerName + route, content[route]);
+                    let prefix = self.setting.web.prefix || '';
+                    self.loadWebRoute(prefix + "/" + controllerName + route, content[route]);
                 })
             });
         });
@@ -127,7 +148,10 @@ class Application {
         Object.keys(handlers).forEach(function (method) {
             let middleware = handlers[method].middleware;
             let handler = handlers[method].handler;
-            self[method].call(self, route, middleware, handler);
+            if (handlers[method].cors && process.env.NODE_ENV != 'development') {
+                middleware.unshift(cors({origin: handlers[method].cors}));
+            }
+            self[method].call(self, route, ...middleware, handler);
         })
     }
 }

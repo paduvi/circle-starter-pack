@@ -5,16 +5,20 @@
   "main": "server.js",
   "dependencies": {
     "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.1",
     "express": "^4.14.0",
     "glob": "^7.1.1",
     "glob-promise": "^2.0.0",
+    "helmet": "^3.1.0",
     "mongodb": "^2.2.11",
     "path": "^0.12.7",
     "zmq": "^2.15.3"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodemon server-dev.js",
+    "run": "node server.js"
   },
   "author": "cho to xau tinh",
   "license": "ISC"

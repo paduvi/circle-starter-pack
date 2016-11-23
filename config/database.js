@@ -18,7 +18,7 @@ module.exports = function (app) {
 
 function connectMongo(app) {
     return new Promise(function (resolve, reject) {
-        MongoClient.connect(`mongodb://${app.config.db.mongo.host}/${app.config.db.mongo.name}`, function (err, dbConnection) {
+        MongoClient.connect(`mongodb://${app.setting.db.mongo.host}/${app.setting.db.mongo.name}`, function (err, dbConnection) {
             if (err)
                 return reject(err);
             resolve(dbConnection);
