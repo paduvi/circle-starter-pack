@@ -7,11 +7,20 @@ var database = require("../config/database.js");
 var path = require('path');
 var glob = require('glob-promise');
 var zmq = require('zmq');
+var http = require('http');
+var express = require('express');
 
 class Application {
     constructor() {
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
         global.__base = path.join(__dirname, "..");
+
+        var app = express();
+        Object.assign(this, app);
+        this.expressApp = function (req, res, next) {
+            this.handle(req, res, next);
+        }.bind(this);
+
         this.getGlobalConfig();
     }
 
@@ -32,7 +41,7 @@ class Application {
         }).then(function (db) {
             self.db = db;
             self.sub = zmq.socket('sub'); // create subscriber endpoint
-            return self.loadMessageRouting();
+            return self.loadMessageRoutes();
         }).then(function () {
             let prefix = self.config.zmq.sub_prefix;
             self.sub.subscribe(prefix);
@@ -55,18 +64,30 @@ class Application {
                 }
             });
         }).then(function () {
+            return self.loadWebController();
+        }).then(function () {
+            return http.createServer(self.expressApp);
+        }).then(function (server) {
+            self.httpServer = server;
+
+            server.listen(self.config.web.port, () => {
+                console.log('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
+                console.log('Application started on port ' + self.config.web.port, ', Process ID: ' + process.pid);
+            });
+
             // connect to publisher
-            let pubAddress = "tcp://localhost:3000";
-            self.sub.connect(pubAddress);
-            console.log(`Connected to zmq publisher at ${pubAddress}.`);
-        })
+            self.sub.connect(self.config.zmq.pub_address);
+            console.log(`Connected to zmq publisher at ${self.config.zmq.pub_address}.`);
+        }).catch(function (err) {
+            console.error(err)
+        });
     }
 
     connectDatabase() {
         return database(this);
     }
 
-    loadMessageRouting() {
+    loadMessageRoutes() {
         var self = this;
         this.messageRoute = {}
         return glob(`${__base}/controller/socket/**/route.js`).then(function (files) {
@@ -76,16 +97,39 @@ class Application {
                 Object.keys(content).forEach(function (route) {
                     if (!route.startsWith("/"))
                         route = "/" + route;
-                    self.loadRoute("/" + controllerName + route, content[route]);
+                    self.handleMessageRoute("/" + controllerName + route, content[route]);
                 })
             });
         });
     }
 
-    loadRoute(route, handler) {
+    handleMessageRoute(route, handler) {
         this.messageRoute[route] = handler;
     }
 
+    loadWebController() {
+        var self = this;
+        return glob(`${__base}/controller/web/**/route.js`).then(function (files) {
+            return Promise.map(files, function (filePath) {
+                let controllerName = path.dirname(filePath).split("/").pop();
+                let content = require(filePath)(self);
+                Object.keys(content).forEach(function (route) {
+                    if (!route.startsWith("/"))
+                        route = "/" + route;
+                    self.loadWebRoute(self.config.web.prefix + "/" + controllerName + route, content[route]);
+                })
+            });
+        });
+    }
+
+    loadWebRoute(route, handlers) {
+        var self = this;
+        Object.keys(handlers).forEach(function (method) {
+            let middleware = handlers[method].middleware;
+            let handler = handlers[method].handler;
+            self[method].call(self, route, middleware, handler);
+        })
+    }
 }
 
 module.exports = Application;
