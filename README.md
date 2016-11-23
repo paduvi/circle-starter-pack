@@ -32,7 +32,8 @@ Ví dụ route `controller/online-course/route.js` + prefix là `'/api'`:
 -> Hàm trên sẽ tương ứng với lệnh `app.get('/api/online-course/complete-video', [], online.completeVideo)` trong express
 -> Danh sách các middleware mình khai báo ở trong phần `middleware` (optional)
 -> Danh sách các IP cho phép truy cập vào mình khai báo ở phần `cors` (optional, mặc định là tất cả các ip đều được cho phép):
-    - Chi tiết xem trong cấu hình `origin` của thằng [cors](/api/online-course/complete-video)
+    - Giá trị là mảng các giá trị ip/domain cho phép truy cập.
+    - Chặn tất cả các request trên tất cả mọi thiết bị từ các ip không hợp lệ, chứ ko chỉ trên mỗi browser.
     - Lưu ý: ở chế độ development, cors sẽ bị tắt.
 
 ### Chi tiết database:
