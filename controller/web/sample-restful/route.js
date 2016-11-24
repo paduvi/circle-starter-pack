@@ -28,14 +28,14 @@ module.exports = function (application) {
                 cors: "14.177.9.185" //optional
             }
         },
-        "/sample-update": {
+        "/sample-update/:sample_id": {
             put: {
                 handler: sample.updateSample,
                 middleware: [],
                 cors: ''
             }
         },
-        "/sample-delete": {
+        "/sample-delete/:sample_id": {
             delete: {
                 handler: sample.deleteSample,
                 middleware: [],

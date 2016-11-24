@@ -77,13 +77,51 @@ module.exports = function (app) {
         },
 
         updateSample: function (req, res) {
-            res.sendStatus(200);
+            sample.update({
+                count: req.body.count,
+                name: req.body.name
+            },{
+                where: {
+                    id: req.params.sample_id
+                }
+            }).then(function(result){
+                return res.jsonp({
+                    status: 200,
+                    message: "Cập nhật thông tin bản ghi thành công!",
+                    data: result
+                })
+            }).catch(function(error){
+                return res.jsonp({
+                    status: 500,
+                    message: error
+                })
+            });
         },
 
         deleteSample: function (req, res) {
-            res.sendStatus(200);
+            sample.destroy({
+                where: {
+                    id: req.params.sample_id
+                }
+            }).then(function (result) {
+                if (result) {
+                    return res.jsonp({
+                        status: 200,
+                        message: "Bản ghi đã được xóa thành công!"
+                    })
+                } else {
+                    return res.jsonp({
+                        status: 201,
+                        message: "Không tìm thấy bản ghi này hoặc đã được xóa trước đó!"
+                    })
+                }
+            }).catch(function (error) {
+                return res.jsonp({
+                    status: 500,
+                    message: error
+                });
+            });
         }
     }
-
 };
 

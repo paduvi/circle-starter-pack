@@ -111,6 +111,67 @@
         }
       }
     },
+    "/sample-restful/sample-update/{sample_id}": {
+      "put": {
+        "summary": "Cập nhật thông tin 1 sample có ID",
+        "description": "Cập nhật thông tin của 1 sample thông qua điều kiện là ID của sample đó",
+        "tags": [
+          "SAMPLE_RESTFUL"
+        ],
+        "parameters": [
+          {
+            "name": "sample_id",
+            "in": "path",
+            "description": "ID sample",
+            "default": 9,
+            "required": true,
+            "type": "number"
+          },
+          {
+            "name": "task",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TaskUpdateSampleRestful"
+            }
+          }
+        ]
+      }
+    },
+    "/sample-restful/sample-delete/{sample_id}": {
+      "delete": {
+        "summary": "Xóa thông tin 1 sample có ID",
+        "description": "Xóa thông tin của 1 sample thông qua điều kiện là ID của sample đó",
+        "tags": [
+          "SAMPLE_RESTFUL"
+        ],
+        "parameters": [
+          {
+            "name": "sample_id",
+            "in": "path",
+            "description": "ID sample",
+            "default": 9,
+            "required": true,
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trả về thông tin trạng thái xem bản ghi đó đã được xóa hay chưa",
+            "schema": {
+              "$ref": "#/definitions/DefaultObject"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/sample-restful/sample-create": {
       "post": {
         "summary": "Thêm mới dữ liệu Sample",
@@ -145,28 +206,7 @@
         }
       }
     },
-    "/sample-restful/sample-update": {
-      "put": {
-        "summary": "Cập nhật thông tin sample data",
-        "description": "",
-        "tags": [
-          "SAMPLE_RESTFUL"
-        ],
-        "parameters": [
-          {
-            "name": "task",
-            "in": "body",
-            "description": "",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/TaskUpdateSampleRestful"
-            }
-          }
-        ]
-      }
-    },
     "/sample-restful/sample-delete": {
-
     }
   },
   "definitions": {
@@ -184,9 +224,10 @@
           "default": "Techmaster Viet Nam"
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     },
-
     "TaskUpdateSampleRestful": {
       "description": "Update sample restful",
       "properties": {
@@ -201,9 +242,10 @@
           "default": "Devops, Run and running nodejs web application"
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     },
-
     "DefaultArray": {
       "type": "object",
       "properties": {
