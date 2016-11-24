@@ -17,6 +17,7 @@
     "path": "^0.12.7",
     "pg": "^6.1.0",
     "sequelize": "^3.27.0",
+    "winston": "^2.3.0",
     "zmq": "^2.15.3"
   },
   "devDependencies": {},

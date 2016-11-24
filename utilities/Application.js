@@ -9,7 +9,6 @@ var glob = require('glob-promise');
 var zmq = require('zmq');
 var http = require('http');
 var express = require('express');
-var ipUtil = require('./ipUtils');
 
 class Application {
     constructor() {
@@ -55,9 +54,24 @@ class Application {
         expressFunction(this);
     }
 
+    loadHelpers() {
+        var self = this;
+        return glob(`${__base}/utilities/helpers/*.js`).then(function (files) {
+            let helpers = {};
+            files.map(function (filePath) {
+                let filename = path.basename(filePath, '.js');
+                helpers[filename] = require(filePath);
+            });
+            Object.assign(self, {helpers: helpers});
+            return;
+        });
+    }
+
     start() {
         var self = this;
         return Promise.resolve().then(function () {
+            return self.loadHelpers();
+        }).then(function () {
             return self.connectDatabase();
         }).then(function (db) {
             self.db = db;
@@ -93,13 +107,13 @@ class Application {
             self.httpServer = server;
 
             server.listen(self.setting.web.port, () => {
-                console.log('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
-                console.log('Application started on port ' + self.setting.web.port, ', Process ID: ' + process.pid);
+                self.helpers.logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
+                self.helpers.logger.info('Application started on port ' + self.setting.web.port, ', Process ID: ' + process.pid);
             });
 
             // connect to publisher
             self.sub.connect(self.setting.zmq.pub_address);
-            console.log(`Connected to zmq publisher at ${self.setting.zmq.pub_address}.`);
+            self.helpers.logger.info(`Connected to zmq publisher at ${self.setting.zmq.pub_address}.`);
             return;
         }).catch(function (err) {
             console.error(err)
@@ -113,7 +127,7 @@ class Application {
     loadMessageRoutes() {
         var self = this;
         this.messageRoute = {}
-        return glob(`${__base}/controller/socket/**/route.js`).then(function (files) {
+        return glob(`${__base}/controller/socket/*/route.js`).then(function (files) {
             return Promise.map(files, function (filePath) {
                 let controllerName = path.dirname(filePath).split("/").pop();
                 let content = require(filePath)(self);
@@ -121,7 +135,8 @@ class Application {
                     if (!route.startsWith("/"))
                         route = "/" + route;
                     self.handleMessageRoute("/" + controllerName + route, content[route]);
-                })
+                });
+                return;
             });
         });
     }
@@ -132,7 +147,7 @@ class Application {
 
     loadWebController() {
         var self = this;
-        return glob(`${__base}/controller/web/**/route.js`).then(function (files) {
+        return glob(`${__base}/controller/web/*/route.js`).then(function (files) {
             return Promise.map(files, function (filePath) {
                 let controllerName = path.dirname(filePath).split("/").pop();
                 let content = require(filePath)(self);
@@ -157,14 +172,14 @@ class Application {
                     let ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
                     if (cors.constructor === Array) {
                         return Promise.map(cors, function (allow_origin) {
-                            return ipUtil.isAllowed(ip, allow_origin);
+                            return self.helpers.ipUtils.isAllowed(ip, allow_origin);
                         }).then(function (results) {
                             if (~results.indexOf(true))
                                 return next();
                             return res.sendStatus(403);
                         });
                     }
-                    return ipUtil.isAllowed(ip, cors).then(function (result) {
+                    return self.helpers.ipUtils.isAllowed(ip, cors).then(function (result) {
                         if (result)
                             return next()
                         return res.sendStatus(403);
@@ -172,7 +187,7 @@ class Application {
                 }
                 middleware.unshift(filter);
             }
-            self[method].call(self, route, ...middleware, handler);
+            self[method](route, ...middleware, handler);
             return;
         })
     }
