@@ -8,3 +8,8 @@ function add(a, b) {
 }
 
 console.log(add(...arr));
+
+var a = {};
+
+a.b.c = 2;
+console.log(a);

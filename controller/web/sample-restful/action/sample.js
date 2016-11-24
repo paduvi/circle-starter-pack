@@ -6,7 +6,7 @@
 
 module.exports = function (app) {
 
-    let sample = require(__base + '/models/sample_restful')(app.db.postgres);
+    let sample = app.db.postgres.models.sample;
 
     return {
         getSample: function (req, res) {

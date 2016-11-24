@@ -10,15 +10,11 @@ module.exports = function (application) {
         "/sample-get": {
             get: {
                 handler: sample.getSample,
-                middleware: [],
-                cors: ''
             }
         },
         "/sample-get/:sample_id": {
             get: {
                 handler: sample.getSampleById,
-                middleware: [],
-                cors: ''
             }
         },
         "/sample-create": {
@@ -31,15 +27,11 @@ module.exports = function (application) {
         "/sample-update/:sample_id": {
             put: {
                 handler: sample.updateSample,
-                middleware: [],
-                cors: ''
             }
         },
         "/sample-delete/:sample_id": {
             delete: {
                 handler: sample.deleteSample,
-                middleware: [],
-                cors: ''
             }
         }
     }

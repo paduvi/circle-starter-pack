@@ -74,7 +74,12 @@ class Application {
         }).then(function () {
             return self.connectDatabase();
         }).then(function (db) {
+            Object.keys(db).forEach(function (dbName) {
+                db[dbName].models = {}
+            });
             self.db = db;
+            return self.loadModels();
+        }).then(function () {
             self.sub = zmq.socket('sub'); // create subscriber endpoint
             return self.loadMessageRoutes();
         }).then(function () {
@@ -122,6 +127,20 @@ class Application {
 
     connectDatabase() {
         return database(this);
+    }
+
+    loadModels() {
+        var self = this;
+        this.messageRoute = {}
+        return glob(`${__base}/models/*/*.js`).then(function (files) {
+            return Promise.map(files, function (filePath) {
+                let dbName = path.dirname(filePath).split("/").pop();
+                let modelName = path.basename(filePath, '.js');
+                let content = require(filePath)(self.db[dbName]);
+                self.db[dbName].models[modelName] = content;
+                return;
+            });
+        });
     }
 
     loadMessageRoutes() {
