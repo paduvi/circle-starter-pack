@@ -94,3 +94,9 @@ function connectPostgres(app) {
 }
 ```
 -> Gọi tới Mongo bằng lệnh `app.db.mongo` và Postgres bằng lệnh `app.db.postgres`
+
+### Model
+Các model sẽ nằm trong thư mục `model/{db-name}/{model-name}.js`
+Ví dụ: 
+- Model `User` của db postgres sẽ nằm ở `model/postgres/User.js`
+- Lệnh gọi ra: `app.db.postgres.models.User`
