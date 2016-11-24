@@ -7,7 +7,6 @@
 var MongoClient = require('mongodb').MongoClient;
 var Sequelize = require('sequelize');
 var Promise = require('bluebird');
-var glob = require('glob-promise');
 
 module.exports = function (app) {
     return Promise.all([

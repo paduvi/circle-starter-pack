@@ -1,0 +1,3 @@
+{"level":"info","message":"Connected to zmq publisher at tcp://localhost:3000.","timestamp":"24/11/2016 14:13'"}
+{"level":"info","message":"Application loaded using the \"development\" environment configuration","timestamp":"24/11/2016 14:13'"}
+{"level":"info","message":"Application started on port 8000 , Process ID: 35913","timestamp":"24/11/2016 14:13'"}
