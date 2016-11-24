@@ -74,9 +74,14 @@ class Application {
         }).then(function () {
             return self.connectDatabase();
         }).then(function (db) {
-            Object.keys(db).forEach(function (dbName) {
-                db[dbName].models = {}
-            });
+            let dbList = Object.keys(db);
+            if (dbList.length) {
+                dbList.forEach(function (dbName) {
+                    db[dbName].models = {}
+                });
+            } else {
+                db.models = {}
+            }
             self.db = db;
             return self.loadModels();
         }).then(function () {
@@ -131,13 +136,23 @@ class Application {
 
     loadModels() {
         var self = this;
-        this.messageRoute = {}
-        return glob(`${__base}/models/*/*.js`).then(function (files) {
+        let dbList = Object.keys(this.db);
+        if (dbList.length) {
+            return glob(`${__base}/models/{${dbList.join(",")}}/*.js`).then(function (files) {
+                return Promise.map(files, function (filePath) {
+                    let dbName = path.dirname(filePath).split("/").pop();
+                    let modelName = path.basename(filePath, '.js');
+                    let content = require(filePath)(self.db[dbName]);
+                    self.db[dbName].models[modelName] = content;
+                    return;
+                });
+            });
+        }
+        return glob(`${__base}/models/*.js`).then(function (files) {
             return Promise.map(files, function (filePath) {
-                let dbName = path.dirname(filePath).split("/").pop();
                 let modelName = path.basename(filePath, '.js');
-                let content = require(filePath)(self.db[dbName]);
-                self.db[dbName].models[modelName] = content;
+                let content = require(filePath)(self.db);
+                self.db.models[modelName] = content;
                 return;
             });
         });
