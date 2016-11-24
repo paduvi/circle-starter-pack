@@ -7,6 +7,7 @@
 var MongoClient = require('mongodb').MongoClient;
 var Sequelize = require('sequelize');
 var Promise = require('bluebird');
+var glob = require('glob-promise');
 
 module.exports = function (app) {
     return Promise.all([
@@ -32,8 +33,16 @@ function connectMongo(app) {
 
 function connectPostgres(app) {
     return Promise.resolve().then(function () {
-        // Dùng Sequelize;
-        // let sequelize = new Sequelize(app.config.db.postgres.database, app.config.db.postgres.username, app.config.db.postgres.password);
-        return {}
+        return new Promise(function(resolve, reject){
+            let db = new Sequelize(app.setting.db.postgres.database, app.setting.db.postgres.username, app.setting.db.postgres.password, app.setting.db.postgres);
+
+            db.authenticate().then(function(){
+                resolve(db);
+            }).catch(function(error){
+                if (error)
+                    return reject(`\n${error.name}: ${error.message}\n`)
+            });
+        });
+
     })
 }
