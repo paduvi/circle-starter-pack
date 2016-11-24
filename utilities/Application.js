@@ -164,7 +164,7 @@ class Application {
     loadWebRoute(route, handlers) {
         var self = this;
         return Promise.map(Object.keys(handlers), function (method) {
-            let middleware = handlers[method].middleware;
+            let middleware = handlers[method].middleware || [];
             let handler = handlers[method].handler;
             let cors = handlers[method].cors;
             if (cors && process.env.NODE_ENV != 'development') {
