@@ -21,7 +21,7 @@ Prefix URL được khai báo trong config.js, mặc định nếu không khai b
 
 Ví dụ route `controller/online-course/route.js` + prefix là `'/api'`:
 
-```javascript
+```
         "/complete-video": {
             get: {
                 handler: online.completeVideo,
