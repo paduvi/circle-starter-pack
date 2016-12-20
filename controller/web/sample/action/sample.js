@@ -9,7 +9,7 @@ module.exports = function (app) {
     let sample = app.db.sequelize.models.sample;
 
     return {
-        getSample: function (req, res) {
+        getItem: function (req, res) {
 
             let limit = req.query.limit,
                 page = req.query.page,
@@ -35,7 +35,7 @@ module.exports = function (app) {
             })
         },
 
-        getSampleById: function (req, res) {
+        getItemById: function (req, res) {
             sample.findById(req.params.sample_id).then(function (result) {
                 if (result) {
                     return res.jsonp({
@@ -57,7 +57,7 @@ module.exports = function (app) {
             })
         },
 
-        createSample: function (req, res) {
+        createItem: function (req, res) {
 
             sample.create({
                 count: req.body.count,
@@ -76,7 +76,7 @@ module.exports = function (app) {
             });
         },
 
-        updateSample: function (req, res) {
+        updateItem: function (req, res) {
             sample.update({
                 count: req.body.count,
                 name: req.body.name
@@ -98,7 +98,7 @@ module.exports = function (app) {
             });
         },
 
-        deleteSample: function (req, res) {
+        deleteItem: function (req, res) {
             sample.destroy({
                 where: {
                     id: req.params.sample_id

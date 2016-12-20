@@ -4,14 +4,14 @@
 
 'use strict';
 
-let Sequelize = require('sequelize');
+const DataTypes = require('sequelize');
 
 module.exports = function (sequelize) {
     let Sample = sequelize.define("sample", {
-        id : {
-            type : Sequelize.INTEGER,
-            primaryKey : true,
-            autoIncrement : true,
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
             validate: {
                 isInt: {
                     msg: 'Count must be an integer number'
@@ -19,24 +19,25 @@ module.exports = function (sequelize) {
             }
         },
         count: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             defaultValue: 0,
-            validate : {
-                isInt : {
-                    msg : 'Count must be an integer number'
+            validate: {
+                isInt: {
+                    msg: 'Count must be an integer number'
                 }
             }
         },
         name: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             unique: true,
             allowNull: false
         }
     }, {
         tableName: 'sample_demo',
-        timestamps: false
+        timestamps: false,
+        schema: 'sample'
     });
 
     Sample.sync();
-    return Sample
+    return Sample;
 };

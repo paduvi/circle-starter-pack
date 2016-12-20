@@ -6,7 +6,7 @@ var fs = require('fs');
 var database = require("../config/database.js");
 var mq = require('../config/message_queue');
 var path = require('path');
-var glob = require('glob-promise');
+var glob = require('glob');
 var zmq = require('zmq');
 var http = require('http');
 var express = require('express');
@@ -58,15 +58,13 @@ class Application {
 
     loadHelpers() {
         var self = this;
-        return glob(`${__base}/utilities/helpers/*.js`).then(function (files) {
-            let helpers = {};
-            files.map(function (filePath) {
-                let filename = path.basename(filePath, '.js');
-                helpers[filename] = require(filePath);
-            });
-            Object.assign(self, {helpers: helpers});
-            return;
+        let files = glob.sync(`${__base}/utilities/helpers/*.js`)
+        let helpers = {};
+        files.map(function (filePath) {
+            let filename = path.basename(filePath, '.js');
+            helpers[filename] = require(filePath);
         });
+        return Object.assign(self, {helpers: helpers});
     }
 
     start() {
@@ -147,14 +145,13 @@ class Application {
         var self = this;
         let dbList = Object.keys(this.db);
         if (dbList.length) {
-            return glob(`${__base}/models/{${dbList.join(",")}}/*.js`).then(function (files) {
-                return Promise.map(files, function (filePath) {
-                    let dbName = path.dirname(filePath).split("/").pop();
-                    let modelName = path.basename(filePath, '.js');
-                    let content = require(filePath)(self.db[dbName]);
-                    self.db[dbName].models[modelName] = content;
-                    return;
-                });
+            let files = glob.sync(`${__base}/models/+(${dbList.join("|")})/*.js`);
+            return Promise.map(files, function (filePath) {
+                let dbName = path.dirname(filePath).split("/").pop();
+                let modelName = path.basename(filePath, '.js');
+                let content = require(filePath)(self.db[dbName]);
+                self.db[dbName].models[modelName] = content;
+                return;
             });
         }
     }
@@ -162,17 +159,16 @@ class Application {
     loadMessageRoutes() {
         var self = this;
         this.messageRoute = {}
-        return glob(`${__base}/controller/socket/*/route.js`).then(function (files) {
-            return Promise.map(files, function (filePath) {
-                let controllerName = path.dirname(filePath).split("/").pop();
-                let content = require(filePath)(self);
-                Object.keys(content).forEach(function (route) {
-                    if (!route.startsWith("/"))
-                        route = "/" + route;
-                    self.handleMessageRoute("/" + controllerName + route, content[route]);
-                });
-                return;
+        let files = glob.sync(`${__base}/controller/socket/*/route.js`);
+        return Promise.map(files, function (filePath) {
+            let controllerName = path.dirname(filePath).split("/").pop();
+            let content = require(filePath)(self);
+            Object.keys(content).forEach(function (route) {
+                if (!route.startsWith("/"))
+                    route = "/" + route;
+                self.handleMessageRoute("/" + controllerName + route, content[route]);
             });
+            return;
         });
     }
 
@@ -182,17 +178,16 @@ class Application {
 
     loadWebController() {
         var self = this;
-        return glob(`${__base}/controller/web/*/route.js`).then(function (files) {
-            return Promise.map(files, function (filePath) {
-                let controllerName = path.dirname(filePath).split("/").pop();
-                let content = require(filePath)(self);
-                return Promise.map(Object.keys(content), function (route) {
-                    if (!route.startsWith("/"))
-                        route = "/" + route;
-                    let prefix = self.setting.web.prefix || '';
-                    return self.loadWebRoute(prefix + "/" + controllerName + route, content[route]);
-                })
-            });
+        let files = glob.sync(`${__base}/controller/web/*/route.js`)
+        return Promise.map(files, function (filePath) {
+            let controllerName = path.dirname(filePath).split("/").pop();
+            let content = require(filePath)(self);
+            return Promise.map(Object.keys(content), function (route) {
+                if (!route.startsWith("/"))
+                    route = "/" + route;
+                let prefix = self.setting.web.prefix || '';
+                return self.loadWebRoute(prefix + "/" + controllerName + route, content[route]);
+            })
         });
     }
 

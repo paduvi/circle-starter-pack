@@ -7,31 +7,31 @@
 module.exports = function (application) {
     var sample = require('./action/sample')(application);
     return {
-        "/sample-get": {
+        "/get": {
             get: {
-                handler: sample.getSample,
+                handler: sample.getItem,
             }
         },
-        "/sample-get/:sample_id": {
+        "/get/:sample_id": {
             get: {
-                handler: sample.getSampleById,
+                handler: sample.getItemById,
             }
         },
-        "/sample-create": {
+        "/create": {
             post: {
-                handler: sample.createSample,
+                handler: sample.createItem,
                 middleware: [], // optional
                 cors: "14.177.9.185" //optional
             }
         },
-        "/sample-update/:sample_id": {
+        "/update/:sample_id": {
             put: {
-                handler: sample.updateSample,
+                handler: sample.updateItem,
             }
         },
-        "/sample-delete/:sample_id": {
+        "/delete/:sample_id": {
             delete: {
-                handler: sample.deleteSample,
+                handler: sample.deleteItem,
             }
         }
     }

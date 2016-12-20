@@ -11,7 +11,6 @@
     - socket: dùng zmq
     - web: cung cấp các REST API (chủ yếu là cho phần frontend)
     - senaca: cung cấp các API cho Resource (chủ yếu dùng để gọi giữa các service)
-- action: viết các action sâu về xử lý logic nghiệp vụ cũng như code resource
 - test: thư mục viết test
 
 ### Chi tiết controller:
@@ -94,7 +93,7 @@ function connectMongo(app) {
 
 function connectPostgres(app) {
     return Promise.resolve().then(function () {
-        // Dùng Sequelize;
+        DataType
         return {}
     })
 }

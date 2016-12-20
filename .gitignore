@@ -2,4 +2,3 @@
 node_modules/
 .idea/
 /log/server.log
-config/env

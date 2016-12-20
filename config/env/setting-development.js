@@ -11,11 +11,11 @@ module.exports = {
             name: "payroll"
         },
         postgres: {
-            host: '192.168.1.60',
+            host: 'localhost',
             port: '5432',
-            database: 'payroll',
+            database: 'sample',
             username: 'postgres',
-            password: 'abc',
+            password: '',
             dialect: 'postgres',
             logging: false
         }
