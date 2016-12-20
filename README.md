@@ -2,13 +2,16 @@
 
 ### Cấu trúc folder:
 - config: 
-    - Cấu hình global: `config.js`
-    - Cấu hình theo môi trường: nằm ở `env/{env}.js`
+    - Trọng số cho ứng dụng: `config.js`
+    - Trọng số theo môi trường: `env/config-{env}.js`
+    - Cấu hình thông số các kết nối: `setting.js`
+    - Cấu hình thông số theo môi trường : `env/setting-{env}.js`
     - Kết nối database: `database.js`, có thể kết nối 1 lúc nhiều database cũng được
 - controller:
-    - socket: <tạm bỏ qua> đợi thống nhất dùng zmq hay kafka
-    - web: cung cấp các REST API
-- dao: viết các function để xử lý logic
+    - socket: dùng zmq
+    - web: cung cấp các REST API (chủ yếu là cho phần frontend)
+    - senaca: cung cấp các API cho Resource (chủ yếu dùng để gọi giữa các service)
+- action: viết các action sâu về xử lý logic nghiệp vụ cũng như code resource
 - test: thư mục viết test
 
 ### Chi tiết controller:
@@ -29,11 +32,14 @@ Ví dụ route `controller/online-course/route.js` + prefix là `'/api'`:
 ```
 
 -> Đường dẫn tương ứng: `/api/online-course/complete-video`
+
 -> Hàm trên sẽ tương ứng với lệnh `app.get('/api/online-course/complete-video', [], online.completeVideo)` trong express
+
 -> Danh sách các middleware mình khai báo ở trong phần `middleware` (optional)
--> Danh sách các IP cho phép truy cập vào mình khai báo ở phần `cors` (optional, mặc định là tất cả các ip đều được cho phép):
-    - Giá trị là mảng các giá trị ip/domain cho phép truy cập.
-    - Chặn tất cả các request trên tất cả mọi thiết bị từ các ip không hợp lệ, chứ ko chỉ trên mỗi browser.
+
+-> Danh sách địa chỉ web được phép truy cập AJAX vào service khai báo ở phần `cors` (optional, mặc định là tất cả các request đều được cho phép):
+    
+    - Tham khảo giá trị config ở trong module cors: https://github.com/expressjs/cors#configuration-options
     - Lưu ý: ở chế độ development, cors sẽ bị tắt.
 
 ### Chi tiết database:
@@ -96,7 +102,7 @@ function connectPostgres(app) {
 -> Gọi tới Mongo bằng lệnh `app.db.mongo` và Postgres bằng lệnh `app.db.postgres`
 
 ### Model
-Các model sẽ nằm trong thư mục `model/{db-name}/{model-name}.js`
+Các model sẽ nằm trong thư mục `model/{db-name}/{model-name}.js`.
 Ví dụ: 
-- Model `User` của db postgres sẽ nằm ở `model/postgres/User.js`
-- Lệnh gọi ra: `app.db.postgres.models.User`
+- Model `User` của db có tên là `sequelize` sẽ nằm ở `model/sequelize/User.js`
+- Lệnh gọi ra: `app.db.sequelize.models.User`

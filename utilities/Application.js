@@ -156,14 +156,6 @@ class Application {
                 });
             });
         }
-        return glob(`${__base}/models/*.js`).then(function (files) {
-            return Promise.map(files, function (filePath) {
-                let modelName = path.basename(filePath, '.js');
-                let content = require(filePath)(self.db);
-                self.db.models[modelName] = content;
-                return;
-            });
-        });
     }
 
     loadMessageRoutes() {

@@ -6,7 +6,7 @@
 
 module.exports = function (app) {
 
-    let sample = app.db.models.sample;
+    let sample = app.db.sequelize.models.sample;
 
     return {
         getSample: function (req, res) {
