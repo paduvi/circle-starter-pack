@@ -10,6 +10,7 @@ var glob = require('glob-promise');
 var zmq = require('zmq');
 var http = require('http');
 var express = require('express');
+var cors = require('cors');
 
 class Application {
     constructor() {
@@ -200,26 +201,13 @@ class Application {
         return Promise.map(Object.keys(handlers), function (method) {
             let middleware = handlers[method].middleware || [];
             let handler = handlers[method].handler;
-            let cors = handlers[method].cors;
-            if (cors && process.env.NODE_ENV != 'development') {
-                let filter = function (req, res, next) {
-                    let ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
-                    if (cors.constructor === Array) {
-                        return Promise.map(cors, function (allow_origin) {
-                            return self.helpers.ipUtils.isAllowed(ip, allow_origin);
-                        }).then(function (results) {
-                            if (~results.indexOf(true))
-                                return next();
-                            return res.sendStatus(403);
-                        });
-                    }
-                    return self.helpers.ipUtils.isAllowed(ip, cors).then(function (result) {
-                        if (result)
-                            return next()
-                        return res.sendStatus(403);
-                    })
-                }
-                middleware.unshift(filter);
+            let corsProp = handlers[method].cors;
+            if (corsProp && process.env.NODE_ENV != 'development') {
+                var corsOptions = {
+                    origin: corsProp,
+                    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+                };
+                middleware.unshift(corsOptions);
             }
             self[method](route, ...middleware, handler);
             return;
