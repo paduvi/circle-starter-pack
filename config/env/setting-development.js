@@ -20,7 +20,7 @@ module.exports = {
             logging: false
         }
     },
-    zmq: {
+    mq: {
         sub_prefix: "payroll:",
         pub_address: "tcp://localhost:3000"
     },

@@ -4,6 +4,7 @@
 var Promise = require('bluebird');
 var fs = require('fs');
 var database = require("../config/database.js");
+var mq = require('../config/message_queue');
 var path = require('path');
 var glob = require('glob-promise');
 var zmq = require('zmq');
@@ -85,45 +86,48 @@ class Application {
             self.db = db;
             return self.loadModels();
         }).then(function () {
-            self.sub = zmq.socket('sub'); // create subscriber endpoint
-            return self.loadMessageRoutes();
-        }).then(function () {
-            let prefix = self.setting.zmq.sub_prefix;
-            self.sub.subscribe(prefix);
-            self.sub.on('message', function (data) {
-                data = data.toString("utf8");
-                if (!data.startsWith(prefix))
+            if (!self.setting.mq)
+                return;
+            return self.connectMessageQueue()
+                .then(function (mq) {
+                    self.sub = mq;
+                    return self.loadMessageRoutes();
+                })
+                .then(function () {
+                    let prefix = self.setting.mq.sub_prefix;
+                    self.sub.on('message', function (data) {
+                        data = data.toString("utf8");
+                        if (!data.startsWith(prefix))
+                            return;
+                        data = data.replace(new RegExp("^(" + prefix + ")"), "");
+                        try {
+                            let message = JSON.parse(data);
+                            let from = message.from;
+                            let type = message.payload.type;
+                            let route = "/" + from + "/" + type;
+                            let handler = self.messageRoute[route];
+                            if (!handler)
+                                throw new Error("Route không tồn tại");
+                            handler(message);
+                        } catch (err) {
+                            return console.error(err);
+                        }
+                    });
                     return;
-                data = data.replace(new RegExp("^(" + prefix + ")"), "");
-                try {
-                    let message = JSON.parse(data);
-                    let from = message.from;
-                    let type = message.payload.type;
-                    let route = "/" + from + "/" + type;
-                    let handler = self.messageRoute[route];
-                    if (!handler)
-                        throw new Error("Route không tồn tại");
-                    handler(message);
-                } catch (err) {
-                    return console.error(err);
-                }
-            });
-            return;
+                })
         }).then(function () {
             return self.loadWebController();
         }).then(function () {
             return http.createServer(self.expressApp);
         }).then(function (server) {
             self.httpServer = server;
+            let logger = self.helpers.logger;
 
             server.listen(self.setting.web.port, () => {
-                self.helpers.logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
-                self.helpers.logger.info('Application started on port ' + self.setting.web.port, ', Process ID: ' + process.pid);
+                logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
+                logger.info('Application started on port ' + self.setting.web.port, ', Process ID: ' + process.pid);
             });
 
-            // connect to publisher
-            self.sub.connect(self.setting.zmq.pub_address);
-            self.helpers.logger.info(`Connected to zmq publisher at ${self.setting.zmq.pub_address}.`);
             return;
         }).catch(function (err) {
             console.error(err)
@@ -132,6 +136,10 @@ class Application {
 
     connectDatabase() {
         return database(this);
+    }
+
+    connectMessageQueue() {
+        return mq(this);
     }
 
     loadModels() {
