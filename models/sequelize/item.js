@@ -4,14 +4,13 @@ module.exports = function (sequelize) {
     let Item = sequelize.define("item", {
         id: {
             type: DataTypes.BIGINT,
-            primaryKey: true
+            primaryKey: true,
         },
         title: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        description: DataTypes.TEXT,
-        type: DataTypes.ENUM('fashion', 'electronic', 'service', 'book')
+        description: DataTypes.TEXT
     }, {
         tableName: 'item',
         schema: 'item',

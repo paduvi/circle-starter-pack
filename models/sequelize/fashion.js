@@ -1,5 +1,5 @@
 const DataTypes = require('sequelize');
-var item = require('./item');
+var schemaScript = require('../../script/schema');
 
 module.exports = function (sequelize) {
     let Fashion = sequelize.define("fashion", {
@@ -19,24 +19,14 @@ module.exports = function (sequelize) {
         timestamps: false
     });
 
-    Fashion.hook('afterCreate', function (fashion, options) {
-        // 'transaction' will be available in options.transaction
-        let Item = item(sequelize);
-        // This operation will be part of the same transaction as the
-        // original User.create call.
-        return Item.create(Object.assign({}, fashion.toJSON(), {type: 'fashion'}), {transaction: options.transaction});
-    });
-
     Fashion.sync().then(function () {
-        return sequelize.transaction(function (t) {
-            return Fashion.create({
-                title: 'ahihi',
-                description: 'do ngok'
-            }, {
-                transaction: t
-            })
+        return sequelize.query(schemaScript.inherit('item.fashion', 'item.item'));
+    }).then(function () {
+        return Fashion.create({
+            title: 'ahihi',
+            description: 'do ngok'
         })
-    })
+    });
 
     return Fashion
 };

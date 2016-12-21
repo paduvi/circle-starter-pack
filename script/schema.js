@@ -53,5 +53,17 @@ module.exports = {
                 result := result | (seq_id);
             END;
             $$ LANGUAGE PLPGSQL;`
+    },
+
+    /**
+     *
+     * @param table_name
+     * @param from
+     * @returns {string}
+     */
+    inherit: function (table_name, from) {
+        return `
+            ALTER TABLE ${table_name} NO INHERIT ${from};
+            ALTER TABLE ${table_name} INHERIT ${from}`;
     }
 }
