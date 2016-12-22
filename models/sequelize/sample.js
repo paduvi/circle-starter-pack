@@ -31,7 +31,8 @@ module.exports = function (sequelize) {
             type: DataTypes.STRING,
             unique: true,
             allowNull: false
-        }
+        },
+        type: DataTypes.ENUM('fashion', 'electronic', 'service', 'book')
     }, {
         tableName: 'sample_demo',
         timestamps: false,

@@ -5,3 +5,7 @@ let data = "payroll:abcxyz";
 let prefix = "payroll:";
 
 console.log(data.replace(new RegExp("^(" + prefix + ")"), ""));
+
+let name = `"abc"""`;
+
+console.log(name.replace(/^"+|"+$/gm, ''));

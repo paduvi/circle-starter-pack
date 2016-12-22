@@ -1,6 +1,8 @@
 /**
  * Created by chotoxautinh on 12/20/16.
  */
+var escape = require('../utilities/helpers/escape');
+
 module.exports = {
     /**
      *
@@ -62,8 +64,26 @@ module.exports = {
      * @returns {string}
      */
     inherit: function (table_name, from) {
+        table_name = escape.name(table_name);
+        from = escape.name(from);
         return `
-            ALTER TABLE ${table_name} NO INHERIT ${from};
-            ALTER TABLE ${table_name} INHERIT ${from}`;
+            DO
+                $do$
+                DECLARE v_exists BOOLEAN;
+                
+                BEGIN
+                    select INTO v_exists exists (SELECT * 
+                        FROM    pg_inherits AS i
+                        JOIN    pg_class AS c ON (i.inhrelid=c.oid)
+                        JOIN    pg_catalog.pg_namespace AS cnsp ON cnsp.oid = c.relnamespace
+                        JOIN    pg_class AS p ON (i.inhparent=p.oid)
+                        JOIN    pg_catalog.pg_namespace AS pnsp ON pnsp.oid = p.relnamespace
+                        WHERE   '"' || cnsp.nspname || '"."' || c.relname || '"' = '${table_name}' 
+                            AND '"' || pnsp.nspname || '"."' || p.relname || '"' = '${from}');
+                    IF v_exists = false THEN
+                        ALTER TABLE ${table_name} INHERIT ${from};
+                    END IF;
+                END
+                $do$;`;
     }
 }
