@@ -149,7 +149,7 @@ class Application {
         var self = this;
         let dbList = Object.keys(this.db);
         if (dbList.length) {
-            let files = glob.sync(`${__base}/models/+(${dbList.join("|")})/*.js`);
+            let files = glob.sync(`${__base}/model/+(${dbList.join("|")})/*.js`);
             return Promise.map(files, function (filePath) {
                 let dbName = path.dirname(filePath).split("/").pop();
                 let modelName = path.basename(filePath, '.js');

@@ -10,7 +10,7 @@
 - controller:
     - socket: dùng zmq
     - web: cung cấp các REST API (chủ yếu là cho phần frontend)
-    - senaca: cung cấp các API cho Resource (chủ yếu dùng để gọi giữa các service)
+- action: cung cấp các API dưới dạng hàm (command) cho Resource bên dưới. Sử dụng Seneca, có thể gọi trực tiếp ở service khác thông qua Seneca Client hoặc gọi ở local từ Controller.
 - test: thư mục viết test
 
 ### Chi tiết controller:
