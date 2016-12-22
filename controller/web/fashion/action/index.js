@@ -1,16 +1,9 @@
 /**
- * Created by hailp on 11/24/16.
+ * Created by chotoxautinh on 12/22/16.
  */
-
-"use strict";
-
 module.exports = function (app) {
-
-    let sample = app.db.sequelize.models.sample;
-
     return {
         getItem: function (req, res) {
-
             let limit = req.query.limit,
                 page = req.query.page,
                 offset = 0;
@@ -18,13 +11,14 @@ module.exports = function (app) {
             if (page > 1)
                 offset = (page - 1) * limit;
 
-            sample.findAndCountAll({
+            let opts = {
                 limit: limit,
                 offset: offset
-            }).then(function (results) {
+            }
+            return app.dao.fashion.getItem(opts).then(function (results) {
                 return res.jsonp({
                     status: 200,
-                    message: "Danh sách dữ liệu mẫu",
+                    message: "Danh sách dữ liệu fashion",
                     data: results
                 })
             }).catch(function (error) {
@@ -36,19 +30,18 @@ module.exports = function (app) {
         },
 
         getItemById: function (req, res) {
-            sample.findById(req.params.sample_id).then(function (result) {
+            return app.dao.fashion.getItemById(req.params.id).then(function (result) {
                 if (result) {
                     return res.jsonp({
                         status: 200,
-                        message: "Thông tin của sample",
+                        message: "Thông tin của fashion",
                         data: result
                     })
-                } else {
-                    return res.jsonp({
-                        status: 401,
-                        message: "Không tìm thấy sample với ID " + req.params.sample_id
-                    })
                 }
+                return res.jsonp({
+                    status: 401,
+                    message: "Không tìm thấy fashion với ID " + req.params.id
+                })
             }).catch(function (error) {
                 return res.jsonp({
                     status: 500,
@@ -58,10 +51,9 @@ module.exports = function (app) {
         },
 
         createItem: function (req, res) {
-
-            sample.create({
-                count: req.body.count,
-                name: req.body.name
+            return app.dao.fashion.createItem({
+                title: req.body.title,
+                description: req.body.description
             }).then(function (result) {
                 return res.jsonp({
                     status: 201,
@@ -77,20 +69,16 @@ module.exports = function (app) {
         },
 
         updateItem: function (req, res) {
-            sample.update({
-                count: req.body.count,
-                name: req.body.name
-            },{
-                where: {
-                    id: req.params.sample_id
-                }
-            }).then(function(result){
+            return app.dao.fashion.updateItem({
+                title: req.body.title,
+                description: req.body.description
+            }, req.params.id).then(function (result) {
                 return res.jsonp({
                     status: 200,
                     message: "Cập nhật thông tin bản ghi thành công!",
                     data: result
                 })
-            }).catch(function(error){
+            }).catch(function (error) {
                 return res.jsonp({
                     status: 500,
                     message: error
@@ -99,22 +87,17 @@ module.exports = function (app) {
         },
 
         deleteItem: function (req, res) {
-            sample.destroy({
-                where: {
-                    id: req.params.sample_id
-                }
-            }).then(function (result) {
+            return app.dao.fashion.deleteItem(req.params.id).then(function (result) {
                 if (result) {
                     return res.jsonp({
                         status: 200,
                         message: "Bản ghi đã được xóa thành công!"
                     })
-                } else {
-                    return res.jsonp({
-                        status: 201,
-                        message: "Không tìm thấy bản ghi này hoặc đã được xóa trước đó!"
-                    })
                 }
+                return res.jsonp({
+                    status: 201,
+                    message: "Không tìm thấy bản ghi này hoặc đã được xóa trước đó!"
+                })
             }).catch(function (error) {
                 return res.jsonp({
                     status: 500,
@@ -123,5 +106,4 @@ module.exports = function (app) {
             });
         }
     }
-};
-
+}

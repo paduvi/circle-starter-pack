@@ -85,6 +85,8 @@ class Application {
             self.db = db;
             return self.loadModels();
         }).then(function () {
+            return self.loadActions();
+        }).then(function () {
             if (!self.setting.mq)
                 return;
             return self.connectMessageQueue()
@@ -174,6 +176,18 @@ class Application {
 
     handleMessageRoute(route, handler) {
         this.messageRoute[route] = handler;
+    }
+
+    loadActions() {
+        var self = this;
+        let files = glob.sync(`${__base}/dao/*.js`);
+        self.dao = {};
+        return Promise.map(files, function (filePath) {
+            let namespace = path.basename(filePath, '.js');
+            let content = require(filePath)(self);
+            self.dao[namespace] = content;
+            return;
+        });
     }
 
     loadWebController() {

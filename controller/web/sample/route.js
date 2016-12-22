@@ -5,33 +5,38 @@
 "use strict";
 
 module.exports = function (application) {
-    var sample = require('./action/sample')(application);
+    var sample = require('./action/index')(application);
     return {
         "/get": {
             get: {
-                handler: sample.getItem,
+                handler: sample.getSample,
             }
         },
-        "/get/:sample_id": {
+        "/get/:id([0-9]+)": {
             get: {
-                handler: sample.getItemById,
+                handler: sample.getSampleById,
+            }
+        },
+        "/get-cors/:id([0-9]+)": {
+            get: {
+                handler: sample.getSampleById,
+                middleware: [], // optional
+                cors: '113.190.102.155'
             }
         },
         "/create": {
             post: {
-                handler: sample.createItem,
-                middleware: [], // optional
-                cors: "14.177.9.185" //optional
+                handler: sample.createSample,
             }
         },
-        "/update/:sample_id": {
+        "/update/:id([0-9]+)": {
             put: {
-                handler: sample.updateItem,
+                handler: sample.updateSample,
             }
         },
-        "/delete/:sample_id": {
+        "/delete/:id([0-9]+)": {
             delete: {
-                handler: sample.deleteItem,
+                handler: sample.deleteSample,
             }
         }
     }

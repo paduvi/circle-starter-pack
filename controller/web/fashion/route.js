@@ -5,20 +5,14 @@
 "use strict";
 
 module.exports = function (application) {
-    var fashionAction = require('./action/fashion')(application);
+    var fashionAction = require('./action/index')(application);
     return {
         "/get": {
             get: {
                 handler: fashionAction.getItem,
             }
         },
-        "/get-cors": {
-            get: {
-                handler: fashionAction.getItem,
-                cors: '113.190.102.155'
-            }
-        },
-        "/get/:fashion_id": {
+        "/get/:id([0-9]+)": {
             get: {
                 handler: fashionAction.getItemById,
             }
@@ -28,12 +22,12 @@ module.exports = function (application) {
                 handler: fashionAction.createItem,
             }
         },
-        "/update/:fashion_id": {
+        "/update/:id([0-9]+)": {
             put: {
                 handler: fashionAction.updateItem,
             }
         },
-        "/delete/:fashion_id": {
+        "/delete/:id([0-9]+)": {
             delete: {
                 handler: fashionAction.deleteItem,
             }
