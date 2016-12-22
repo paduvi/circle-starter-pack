@@ -21,11 +21,6 @@ module.exports = function (sequelize) {
 
     Fashion.sync().then(function () {
         return sequelize.query(schemaScript.inherit('item.fashion', 'item.item'));
-    }).then(function () {
-        return Fashion.create({
-            title: 'ahihi',
-            description: 'do ngok'
-        })
     });
 
     return Fashion

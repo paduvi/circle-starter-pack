@@ -2,8 +2,17 @@
  * Created by chotoxautinh on 12/22/16.
  */
 module.exports = function (app) {
+    function handlerError(res, err) {
+        let logger = app.helpers.logger;
+        logger.error(err);
+        return res.jsonp({
+            status: 500,
+            message: err.message
+        })
+    }
+
     return {
-        getItem: function (req, res) {
+        findItem: function (req, res) {
             let limit = req.query.limit,
                 page = req.query.page,
                 offset = 0;
@@ -15,45 +24,44 @@ module.exports = function (app) {
                 limit: limit,
                 offset: offset
             }
-            return app.dao.fashion.getItem(opts).then(function (results) {
+            return app.seneca.exec({
+                role: 'fashion', cmd: 'findItem', options: opts
+            }).then(function (results) {
                 return res.jsonp({
                     status: 200,
                     message: "Danh sách dữ liệu fashion",
                     data: results
                 })
             }).catch(function (error) {
-                return res.jsonp({
-                    status: 500,
-                    message: error
-                })
+                return handlerError(res, error);
             })
         },
 
-        getItemById: function (req, res) {
-            return app.dao.fashion.getItemById(req.params.id).then(function (result) {
-                if (result) {
+        findItemById: function (req, res) {
+            return app.seneca.exec({
+                role: 'fashion', cmd: 'findItemById', id: req.params.id
+            }).then(function (result) {
+                if (result)
                     return res.jsonp({
                         status: 200,
                         message: "Thông tin của fashion",
                         data: result
                     })
-                }
                 return res.jsonp({
                     status: 401,
                     message: "Không tìm thấy fashion với ID " + req.params.id
                 })
             }).catch(function (error) {
-                return res.jsonp({
-                    status: 500,
-                    message: error
-                })
+                return handlerError(res, error);
             })
         },
 
         createItem: function (req, res) {
-            return app.dao.fashion.createItem({
-                title: req.body.title,
-                description: req.body.description
+            return app.seneca.exec({
+                role: 'fashion', cmd: 'createItem', payload: {
+                    title: req.body.title,
+                    description: req.body.description
+                }
             }).then(function (result) {
                 return res.jsonp({
                     status: 201,
@@ -61,48 +69,46 @@ module.exports = function (app) {
                     data: result
                 })
             }).catch(function (error) {
-                return res.jsonp({
-                    status: 500,
-                    message: error
-                })
+                return handlerError(res, error);
             });
         },
 
         updateItem: function (req, res) {
-            return app.dao.fashion.updateItem({
-                title: req.body.title,
-                description: req.body.description
-            }, req.params.id).then(function (result) {
+            return app.seneca.exec({
+                role: 'fashion', cmd: 'updateItem', payload: {
+                    title: req.body.title,
+                    description: req.body.description
+                }, id: req.params.id
+            }).then(function (result) {
+                if (result > 0)
+                    return res.jsonp({
+                        status: 200,
+                        message: "Cập nhật thông tin bản ghi thành công!"
+                    })
                 return res.jsonp({
-                    status: 200,
-                    message: "Cập nhật thông tin bản ghi thành công!",
-                    data: result
+                    status: 401,
+                    message: "Không tìm thấy fashion với ID " + req.params.id
                 })
             }).catch(function (error) {
-                return res.jsonp({
-                    status: 500,
-                    message: error
-                })
+                return handlerError(res, error);
             });
         },
 
         deleteItem: function (req, res) {
-            return app.dao.fashion.deleteItem(req.params.id).then(function (result) {
-                if (result) {
+            return app.seneca.exec({
+                role: 'fashion', cmd: 'deleteItem', id: req.params.id
+            }).then(function (result) {
+                if (result > 0)
                     return res.jsonp({
                         status: 200,
                         message: "Bản ghi đã được xóa thành công!"
                     })
-                }
                 return res.jsonp({
                     status: 201,
                     message: "Không tìm thấy bản ghi này hoặc đã được xóa trước đó!"
                 })
             }).catch(function (error) {
-                return res.jsonp({
-                    status: 500,
-                    message: error
-                });
+                return handlerError(res, error);
             });
         }
     }

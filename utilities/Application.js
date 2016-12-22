@@ -4,10 +4,9 @@
 var Promise = require('bluebird');
 var fs = require('fs');
 var database = require("../config/database.js");
-var mq = require('../config/message_queue');
+var mq = require('../config/socket');
 var path = require('path');
 var glob = require('glob');
-var zmq = require('zmq');
 var http = require('http');
 var express = require('express');
 var cors = require('cors');
@@ -85,7 +84,7 @@ class Application {
             self.db = db;
             return self.loadModels();
         }).then(function () {
-            return self.loadActions();
+            return self.loadSeneca();
         }).then(function () {
             if (!self.setting.mq)
                 return;
@@ -111,7 +110,8 @@ class Application {
                                 throw new Error("Route không tồn tại");
                             handler(message);
                         } catch (err) {
-                            return console.error(err);
+                            let logger = self.helpers.logger;
+                            return logger.error(err);
                         }
                     });
                     return;
@@ -123,6 +123,8 @@ class Application {
         }).then(function (server) {
             self.httpServer = server;
             let logger = self.helpers.logger;
+
+            self.seneca.listen(self.setting.seneca);
 
             server.listen(self.setting.web.port, () => {
                 logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
@@ -178,21 +180,9 @@ class Application {
         this.messageRoute[route] = handler;
     }
 
-    loadActions() {
-        var self = this;
-        let files = glob.sync(`${__base}/dao/*.js`);
-        self.dao = {};
-        return Promise.map(files, function (filePath) {
-            let namespace = path.basename(filePath, '.js');
-            let content = require(filePath)(self);
-            self.dao[namespace] = content;
-            return;
-        });
-    }
-
     loadWebController() {
         var self = this;
-        let files = glob.sync(`${__base}/controller/web/*/route.js`)
+        let files = glob.sync(`${__base}/controller/web/*/route.js`);
         return Promise.map(files, function (filePath) {
             let controllerName = path.dirname(filePath).split("/").pop();
             let content = require(filePath)(self);
@@ -221,6 +211,27 @@ class Application {
             self[method](route, ...middleware, handler);
             return;
         })
+    }
+
+    loadSeneca() {
+        var self = this;
+        self.seneca = require('seneca')({strict: false});
+        self.seneca.exec = Promise.promisify(self.seneca.act);
+        let files = glob.sync(`${__base}/action/*.js`);
+        return Promise.map(files, function (filePath) {
+            let roleName = path.basename(filePath, '.js');
+            let content = require(filePath)(self);
+            Object.keys(content).forEach(function (key) {
+                self.addSenecaCommand(roleName, key, content[key]);
+            });
+            return;
+        });
+    }
+
+    addSenecaCommand(role, cmd, func) {
+        this.seneca.use(function () {
+            this.add({role: role, cmd: cmd}, func);
+        });
     }
 }
 

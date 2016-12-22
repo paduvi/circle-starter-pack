@@ -1,15 +1,15 @@
 /**
  * Created by chotoxautinh on 11/23/16.
  */
-let arr = [1,2];
+let obj = {
+    a: 1,
+    b: 2
+};
 
 function add(a, b) {
+    console.log(a);
+    console.log(b);
     return a+b;
 }
 
-console.log(add(...arr));
-
-var a = {};
-
-a.b.c = 2;
-console.log(a);
+console.log(add(...obj));

@@ -3,7 +3,7 @@
  */
 var Application = require('../utilities/Application');
 var database = require('../config/database');
-var OnlineHandler = require('../dao/implement/OnlineHandler');
+var OnlineHandler = require('./implement/OnlineHandler');
 
 var app = new Application();
 

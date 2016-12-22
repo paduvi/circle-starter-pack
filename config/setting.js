@@ -25,5 +25,10 @@ module.exports = {
     web: {
         port: 8000,
         prefix: '/api'
+    },
+    seneca: {
+        type: 'http',
+        port: '1104',
+        pin: 'cmd:*'
     }
 }

@@ -5,31 +5,27 @@
 "use strict";
 
 module.exports = function (application) {
-    var fashionAction = require('./action/index')(application);
+    var fashionHandler = require('./handler/index')(application);
     return {
-        "/get": {
+        "/": {
             get: {
-                handler: fashionAction.getItem,
+                handler: fashionHandler.findItem,
             }
         },
-        "/get/:id([0-9]+)": {
+        "/:id([0-9]+)": {
             get: {
-                handler: fashionAction.getItemById,
+                handler: fashionHandler.findItemById,
+            },
+            put: {
+                handler: fashionHandler.updateItem,
+            },
+            delete: {
+                handler: fashionHandler.deleteItem,
             }
         },
         "/create": {
             post: {
-                handler: fashionAction.createItem,
-            }
-        },
-        "/update/:id([0-9]+)": {
-            put: {
-                handler: fashionAction.updateItem,
-            }
-        },
-        "/delete/:id([0-9]+)": {
-            delete: {
-                handler: fashionAction.deleteItem,
+                handler: fashionHandler.createItem,
             }
         }
     }

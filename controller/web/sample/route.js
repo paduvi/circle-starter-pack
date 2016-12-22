@@ -5,38 +5,34 @@
 "use strict";
 
 module.exports = function (application) {
-    var sample = require('./action/index')(application);
+    var sampleHandler = require('./handler/index')(application);
     return {
-        "/get": {
+        "/": {
             get: {
-                handler: sample.getSample,
+                handler: sampleHandler.findSample,
             }
         },
-        "/get/:id([0-9]+)": {
+        "/:id([0-9]+)": {
             get: {
-                handler: sample.getSampleById,
+                handler: sampleHandler.findSampleById,
+            },
+            put: {
+                handler: sampleHandler.updateSample,
+            },
+            delete: {
+                handler: sampleHandler.deleteSample,
             }
         },
-        "/get-cors/:id([0-9]+)": {
+        "/cors/:id([0-9]+)": {
             get: {
-                handler: sample.getSampleById,
+                handler: sampleHandler.findSampleById,
                 middleware: [], // optional
                 cors: '113.190.102.155'
             }
         },
         "/create": {
             post: {
-                handler: sample.createSample,
-            }
-        },
-        "/update/:id([0-9]+)": {
-            put: {
-                handler: sample.updateSample,
-            }
-        },
-        "/delete/:id([0-9]+)": {
-            delete: {
-                handler: sample.deleteSample,
+                handler: sampleHandler.createSample,
             }
         }
     }
