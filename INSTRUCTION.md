@@ -8,6 +8,7 @@
 **Lưu ý:** 
 - Để quá trình cài đặt không bị lỗi, trong máy cần phải cài đặt sẵn `zmq`. *CircleJS* sử dụng `zmq` làm phương tiện giao tiếp Message Bus
 - Nếu không muốn sử dụng Message Queue, loại `zmq` ra khỏi danh sách package trong file `package.json` rồi thực hiện tải các `node_modules` như phía trên
+
 2. Chạy ở môi trường `Development`:
 `npm test` hoặc `node server-dev.js`
 
