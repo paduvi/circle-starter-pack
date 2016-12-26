@@ -85,5 +85,18 @@ module.exports = {
                     END IF;
                 END
                 $do$;`;
+    },
+
+    /**
+     *
+     * @param table_name
+     * @param condition
+     * @returns {string}
+     */
+    findOriginateById: function (table_name, id) {
+        table_name = escape.name(table_name);
+        return `SELECT p.relname AS child_table, nsp.nspname AS schema_name
+                    FROM ${table_name} t, pg_class p, pg_catalog.pg_namespace nsp
+                    WHERE t.tableoid = p.oid AND nsp.oid = p.relnamespace AND t.id = ${id}`
     }
 }

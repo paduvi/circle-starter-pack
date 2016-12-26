@@ -86,7 +86,7 @@ class Application {
         }).then(function () {
             return self.loadSeneca();
         }).then(function () {
-            if (!self.setting.mq)
+            if (!self.setting.mq.enable)
                 return;
             return self.connectMessageQueue()
                 .then(function (mq) {
@@ -206,7 +206,7 @@ class Application {
                     origin: corsProp,
                     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
                 };
-                middleware.unshift(corsOptions);
+                middleware.unshift(cors(corsOptions));
             }
             self[method](route, ...middleware, handler);
             return;

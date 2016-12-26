@@ -6,12 +6,12 @@ module.exports = {
         mongo: {
             host: "localhost",
             port: 27017,
-            name: "payroll"
+            name: "circle"
         },
         postgres: {
             host: 'localhost',
             port: '5432',
-            database: 'payroll',
+            database: 'circle',
             username: 'postgres',
             password: '',
             dialect: 'postgres',
@@ -19,8 +19,9 @@ module.exports = {
         }
     },
     mq: {
-        sub_prefix: "payroll:",
-        pub_address: "tcp://localhost:3000"
+        sub_prefix: "circle:",
+        pub_address: "tcp://localhost:3000",
+        enable: false
     },
     web: {
         port: 8000,

@@ -21,16 +21,8 @@ module.exports = {
         }
     },
     mq: {
-        sub_prefix: "payroll:",
-        pub_address: "tcp://localhost:3000"
-    },
-    web: {
-        port: 8000,
-        prefix: '/api'
-    },
-    seneca: {
-        type: 'http',
-        port: '1104',
-        pin: 'cmd:*'
+        sub_prefix: "circle:",
+        pub_address: "tcp://localhost:3000",
+        enable: true
     }
 };

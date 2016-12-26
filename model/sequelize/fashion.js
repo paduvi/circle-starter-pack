@@ -12,7 +12,11 @@ module.exports = function (sequelize) {
             type: DataTypes.STRING,
             allowNull: false
         },
-        description: DataTypes.TEXT
+        description: DataTypes.TEXT,
+        price: {
+            type: DataTypes.BIGINT,
+            defaultValue: 0
+        }
     }, {
         tableName: 'fashion',
         schema: 'item',
