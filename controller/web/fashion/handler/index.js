@@ -2,17 +2,9 @@
  * Created by chotoxautinh on 12/22/16.
  */
 module.exports = function (app) {
-    function handlerError(res, err) {
-        let logger = app.helpers.logger;
-        logger.error(err);
-        return res.jsonp({
-            status: 500,
-            message: err.message
-        })
-    }
 
     return {
-        findItem: function (req, res) {
+        findItem: function (req, res, next) {
             let limit = req.query.limit,
                 page = req.query.page,
                 offset = 0;
@@ -32,12 +24,10 @@ module.exports = function (app) {
                     message: "Danh sách dữ liệu fashion",
                     data: results
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            })
+            }).catch(next)
         },
 
-        findItemById: function (req, res) {
+        findItemById: function (req, res, next) {
             return app.seneca.exec({
                 role: 'fashion', cmd: 'findItemById', id: req.params.id
             }).then(function (result) {
@@ -51,12 +41,10 @@ module.exports = function (app) {
                     status: 401,
                     message: "Không tìm thấy fashion với ID " + req.params.id
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            })
+            }).catch(next)
         },
 
-        createItem: function (req, res) {
+        createItem: function (req, res, next) {
             return app.seneca.exec({
                 role: 'fashion', cmd: 'createItem', payload: {
                     title: req.body.title,
@@ -68,12 +56,10 @@ module.exports = function (app) {
                     message: "Thêm mới dữ liệu thành công",
                     data: result
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            });
+            }).catch(next);
         },
 
-        updateItem: function (req, res) {
+        updateItem: function (req, res, next) {
             return app.seneca.exec({
                 role: 'fashion', cmd: 'updateItem', payload: {
                     title: req.body.title,
@@ -89,12 +75,10 @@ module.exports = function (app) {
                     status: 401,
                     message: "Không tìm thấy fashion với ID " + req.params.id
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            });
+            }).catch(next);
         },
 
-        deleteItem: function (req, res) {
+        deleteItem: function (req, res, next) {
             return app.seneca.exec({
                 role: 'fashion', cmd: 'deleteItem', id: req.params.id
             }).then(function (result) {
@@ -107,9 +91,7 @@ module.exports = function (app) {
                     status: 201,
                     message: "Không tìm thấy bản ghi này hoặc đã được xóa trước đó!"
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            });
+            }).catch(next);
         }
     }
 }

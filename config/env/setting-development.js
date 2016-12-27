@@ -3,7 +3,6 @@
  */
 module.exports = {
 
-    enableSwagger: true,
     db: {
         mongo: {
             host: "localhost",
@@ -21,8 +20,7 @@ module.exports = {
         }
     },
     mq: {
-        sub_prefix: "circle:",
-        pub_address: "tcp://localhost:3000",
-        enable: true
-    }
+        sub_prefix: "payroll:",
+        pub_address: "tcp://localhost:3000"
+    },
 };

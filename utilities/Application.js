@@ -4,7 +4,6 @@
 var Promise = require('bluebird');
 var fs = require('fs');
 var database = require("../config/database.js");
-var mq = require('../config/socket');
 var path = require('path');
 var glob = require('glob');
 var http = require('http');
@@ -16,17 +15,23 @@ class Application {
 
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
         global.__base = path.join(__dirname, "..");
+        this.rootFolder = __base;
 
         var app = express();
-
 
         Object.assign(this, app);
         this.expressApp = function (req, res, next) {
             this.handle(req, res, next);
         }.bind(this);
 
+        this.plugin = {}
+        this.plug = function (plugin, ...args) {
+            plugin.apply(this, args);
+        }.bind(this);
+
         this.getGlobalConfig();
         this.getGlobalSetting();
+        this.useLogger();
         this.useExpressSetting();
     }
 
@@ -48,6 +53,11 @@ class Application {
         } catch (e) {
             // It isn't accessible
         }
+    }
+
+    useLogger() {
+        let logger = require(`${__base}/config/logger.js`);
+        this.logger = logger;
     }
 
     useExpressSetting() {
@@ -86,49 +96,19 @@ class Application {
         }).then(function () {
             return self.loadSeneca();
         }).then(function () {
-            if (!self.setting.mq.enable)
-                return;
-            return self.connectMessageQueue()
-                .then(function (mq) {
-                    self.sub = mq;
-                    return self.loadMessageRoutes();
-                })
-                .then(function () {
-                    let prefix = self.setting.mq.sub_prefix;
-                    self.sub.on('message', function (data) {
-                        data = data.toString("utf8");
-                        if (!data.startsWith(prefix))
-                            return;
-                        data = data.replace(new RegExp("^(" + prefix + ")"), "");
-                        try {
-                            let message = JSON.parse(data);
-                            let from = message.from;
-                            let type = message.payload.type;
-                            let route = "/" + from + "/" + type;
-                            let handler = self.messageRoute[route];
-                            if (!handler)
-                                throw new Error("Route không tồn tại");
-                            handler(message);
-                        } catch (err) {
-                            let logger = self.helpers.logger;
-                            return logger.error(err);
-                        }
-                    });
-                    return;
-                })
-        }).then(function () {
             return self.loadWebController();
+        }).then(function () {
+            return self.handleError();
         }).then(function () {
             return http.createServer(self.expressApp);
         }).then(function (server) {
             self.httpServer = server;
-            let logger = self.helpers.logger;
 
             self.seneca.listen(self.setting.seneca);
 
             server.listen(self.setting.web.port, () => {
-                logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
-                logger.info('Application started on port ' + self.setting.web.port, ', Process ID: ' + process.pid);
+                self.logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
+                self.logger.info('Application started on port ' + self.setting.web.port, ', Process ID: ' + process.pid);
             });
 
             return;
@@ -137,12 +117,13 @@ class Application {
         });
     }
 
-    connectDatabase() {
-        return database(this);
+    handleError() {
+        var errorHandler = require(`${__base}/config/error.js`);
+        errorHandler(this);
     }
 
-    connectMessageQueue() {
-        return mq(this);
+    connectDatabase() {
+        return database(this);
     }
 
     loadModels() {
@@ -158,26 +139,6 @@ class Application {
                 return;
             });
         }
-    }
-
-    loadMessageRoutes() {
-        var self = this;
-        this.messageRoute = {}
-        let files = glob.sync(`${__base}/controller/socket/*/route.js`);
-        return Promise.map(files, function (filePath) {
-            let controllerName = path.dirname(filePath).split("/").pop();
-            let content = require(filePath)(self);
-            Object.keys(content).forEach(function (route) {
-                if (!route.startsWith("/"))
-                    route = "/" + route;
-                self.handleMessageRoute("/" + controllerName + route, content[route]);
-            });
-            return;
-        });
-    }
-
-    handleMessageRoute(route, handler) {
-        this.messageRoute[route] = handler;
     }
 
     loadWebController() {

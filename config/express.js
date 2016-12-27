@@ -5,6 +5,7 @@ var express = require('express');
 var helmet = require('helmet');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
+var errorHandler = require('./error');
 
 module.exports = function (app) {
     app.use(helmet());
@@ -24,13 +25,6 @@ module.exports = function (app) {
         app.locals.cache = 'memory';
         app.disabled('verbose errors');
         app.set('trust proxy', 1);
-    }
-
-    if (app.setting.enableSwagger) {
-        // Swagger document loader
-
-        app.enable('trust proxy');
-        app.use(express.static(__base + '/public', {maxAge: 3600}));
     }
 
 };

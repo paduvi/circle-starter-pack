@@ -4,17 +4,9 @@
 var Promise = require('bluebird');
 
 module.exports = function (app) {
-    function handlerError(res, err) {
-        let logger = app.helpers.logger;
-        logger.error(err);
-        return res.jsonp({
-            status: 500,
-            message: err.message
-        })
-    }
 
     return {
-        findItem: function (req, res) {
+        findItem: function (req, res, next) {
             let limit = req.query.limit,
                 page = req.query.page,
                 offset = 0;
@@ -34,12 +26,10 @@ module.exports = function (app) {
                     message: "Danh sách dữ liệu item",
                     data: results
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            })
+            }).catch(next);
         },
 
-        findItemById: function (req, res) {
+        findItemById: function (req, res, next) {
             return Promise.coroutine(function*() {
                 let result = yield app.seneca.exec({
                     role: 'item', cmd: 'findItemOriginate', table_name: 'item.item', id: req.params.id
@@ -71,9 +61,7 @@ module.exports = function (app) {
                     status: 401,
                     message: "Không tìm thấy item với ID " + req.params.id
                 })
-            })().catch(function (error) {
-                return handlerError(res, error);
-            })
+            })().catch(next)
         }
     }
 }

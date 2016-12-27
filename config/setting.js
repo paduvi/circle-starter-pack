@@ -20,8 +20,7 @@ module.exports = {
     },
     mq: {
         sub_prefix: "circle:",
-        pub_address: "tcp://localhost:3000",
-        enable: false
+        pub_address: "tcp://localhost:3000"
     },
     web: {
         port: 8000,

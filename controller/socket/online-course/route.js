@@ -6,5 +6,8 @@
 module.exports = function (application) {
 
     return {
+        'complete-video': function () {
+            console.log('ahihi');
+        }
     }
 };

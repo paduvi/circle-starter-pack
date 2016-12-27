@@ -2,17 +2,9 @@
  * Created by chotoxautinh on 12/22/16.
  */
 module.exports = function (app) {
-    function handlerError(res, err) {
-        let logger = app.helpers.logger;
-        logger.error(err);
-        return res.jsonp({
-            status: 500,
-            message: err.message
-        })
-    }
 
     return {
-        findSample: function (req, res) {
+        findSample: function (req, res, next) {
             let limit = req.query.limit,
                 page = req.query.page,
                 offset = 0;
@@ -32,12 +24,10 @@ module.exports = function (app) {
                     message: "Danh sách dữ liệu sample",
                     data: results
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            })
+            }).catch(next)
         },
 
-        findSampleById: function (req, res) {
+        findSampleById: function (req, res, next) {
             return app.seneca.exec({
                 role: 'sample', cmd: 'findSampleById', id: req.params.id
             }).then(function (result) {
@@ -52,12 +42,10 @@ module.exports = function (app) {
                     status: 401,
                     message: "Không tìm thấy sample với ID " + req.params.id
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            })
+            }).catch(next)
         },
 
-        createSample: function (req, res) {
+        createSample: function (req, res, next) {
             return app.seneca.exec({
                 role: 'sample', cmd: 'createSample', payload: {
                     count: req.body.count,
@@ -70,12 +58,10 @@ module.exports = function (app) {
                     message: "Thêm mới dữ liệu thành công",
                     data: result
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            });
+            }).catch(next);
         },
 
-        updateSample: function (req, res) {
+        updateSample: function (req, res, next) {
             return app.seneca.exec({
                 role: 'sample', cmd: 'updateSample', payload: {
                     count: req.body.count,
@@ -92,12 +78,10 @@ module.exports = function (app) {
                     status: 401,
                     message: "Không tìm thấy sample với ID " + req.params.id
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            });
+            }).catch(next);
         },
 
-        deleteSample: function (req, res) {
+        deleteSample: function (req, res, next) {
             return app.seneca.exec({
                 role: 'sample', cmd: 'deleteSample', id: req.params.id
             }).then(function (result) {
@@ -110,9 +94,7 @@ module.exports = function (app) {
                     status: 201,
                     message: "Không tìm thấy bản ghi này hoặc đã được xóa trước đó!"
                 })
-            }).catch(function (error) {
-                return handlerError(res, error);
-            });
+            }).catch(next);
         }
     }
 }
