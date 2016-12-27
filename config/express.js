@@ -5,7 +5,6 @@ var express = require('express');
 var helmet = require('helmet');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
-var errorHandler = require('./error');
 
 module.exports = function (app) {
     app.use(helmet());

@@ -6,14 +6,11 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
-    "cors": "^2.8.1",
+    "circlejs": "*",
     "express": "^4.14.0",
-    "glob": "^7.1.1",
     "helmet": "^3.1.0",
     "method-override": "^2.3.7",
-    "path": "^0.12.7",
     "pg": "^6.1.0",
-    "seneca": "^3.2.2",
     "sequelize": "^3.27.0",
     "winston": "^2.3.0"
   },
