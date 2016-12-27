@@ -4,6 +4,7 @@
 var escape = require('../utilities/helpers/escape');
 
 module.exports = {
+
     /**
      *
      * @param schema_name
@@ -11,6 +12,7 @@ module.exports = {
     createSchema: function (schema_name) {
         return `create schema if not exists "${schema_name}"`;
     },
+
     /**
      * $1: schema_name
      * $2: schema_id
@@ -98,5 +100,34 @@ module.exports = {
         return `SELECT p.relname AS child_table, nsp.nspname AS schema_name
                     FROM ${table_name} t, pg_class p, pg_catalog.pg_namespace nsp
                     WHERE t.tableoid = p.oid AND nsp.oid = p.relnamespace AND t.id = ${id}`
+    },
+
+    /**
+     *
+     * @param enum_name
+     * @param values
+     * @returns {string}
+     */
+    createEnum: function (enum_name, ...values) {
+        enum_name = escape.name(enum_name);
+        values = values.map(value => escape.text(value)).join();
+        return `
+            DO
+            $do$
+            DECLARE v_exists BOOLEAN;
+            
+            BEGIN
+                select INTO v_exists exists (SELECT *
+                    FROM        pg_type t 
+                    LEFT JOIN   pg_catalog.pg_namespace n ON n.oid = t.typnamespace 
+                    WHERE       (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid)) 
+                    AND     NOT EXISTS(SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = t.typelem AND el.typarray = t.oid)
+                    AND     n.nspname NOT IN ('pg_catalog', 'information_schema')
+                    AND     '"' || n.nspname || '"."' || t.typname || '"' = '${enum_name}');
+                IF v_exists = false THEN
+                    CREATE TYPE ${enum_name} AS ENUM (${values});
+                END IF;
+            END
+            $do$;`
     }
 }
