@@ -18,9 +18,5 @@ module.exports = {
             dialect: 'postgres',
             logging: false
         }
-    },
-    mq: {
-        sub_prefix: "payroll:",
-        pub_address: "tcp://localhost:3000"
-    },
+    }
 };

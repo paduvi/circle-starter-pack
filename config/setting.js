@@ -18,10 +18,6 @@ module.exports = {
             logging: false
         }
     },
-    mq: {
-        sub_prefix: "circle:",
-        pub_address: "tcp://localhost:3000"
-    },
     web: {
         port: 8000,
         prefix: '/api'

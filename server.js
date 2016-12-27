@@ -3,9 +3,7 @@
  */
 process.env.NODE_ENV = 'production';
 var Application = require('./utilities/Application');
-var CircleZMQ = require('circle-zmq');
 
 var app = new Application();
-app.plug(CircleZMQ, app.setting.mq);
 
 app.start();
