@@ -1,5 +1,5 @@
 {
-  "name": "circlejs",
+  "name": "circle-starter-pack",
   "version": "1.0.0",
   "description": "core framework for micro-service",
   "main": "server.js",
@@ -22,6 +22,7 @@
     "test": "nodemon server-dev.js",
     "run": "node server.js"
   },
+  "repository": "https://github.com/paduvi/circle-starter-pack.git",
   "author": "paduvi",
   "license": "ISC"
 }
