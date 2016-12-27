@@ -5,10 +5,6 @@
 
 Để tải các thư viện `node_modules`, ta sử dụng câu lệnh: `npm install`
 
-**Lưu ý:** 
-- Để quá trình cài đặt không bị lỗi, trong máy cần phải cài đặt sẵn `zmq`. *CircleJS* sử dụng `zmq` làm phương tiện giao tiếp Message Bus
-- Nếu không muốn sử dụng Message Queue, loại `zmq` ra khỏi danh sách package trong file `package.json` rồi thực hiện tải các `node_modules` như phía trên
-
 2 - Chạy ở môi trường `Development`:
 `npm test` hoặc `node server-dev.js`
 
@@ -22,7 +18,6 @@
     - Cấu hình thông số theo môi trường : `env/setting-{env}.js`
     - Kết nối database: `database.js`, có thể kết nối 1 lúc nhiều database cũng được
 - controller:
-    - socket: dùng zmq
     - web: cung cấp các REST API (chủ yếu là cho phần frontend)
 - action: cung cấp các API dưới dạng hàm (command) cho Resource bên dưới. Sử dụng Seneca, có thể gọi trực tiếp ở service khác thông qua Seneca Client hoặc gọi ở local từ Controller.
 - test: thư mục viết test
@@ -155,20 +150,3 @@ Lệnh gọi ra action được khai báo ở trên: `app.seneca.exec({role: 'it
 - `role` chính là tên file: `item`
 - `cmd` chính là tên khóa: `findItem`
 - các tham số còn lại sẽ được Seneca gom lại vào trong 1 Object, để truyền vào trong hàm Action. Ví dụ tham số `options` được gọi ra thông qua biến `msg.options`
-
-### Message Queue:
-
-Mặc định tính năng Message Queue của CircleJS bị tắt, ta có thể bật nó lên bằng cách chỉnh trong `setting`, sửa lại:
-```
-    mq: {
-        sub_prefix: "circle:",
-        pub_address: "tcp://localhost:3000",
-        enable: true  /* Sửa thành true */
-    }
-```
-
-Hiện *CircleJS* mới hỗ trợ sử dụng `zmq`, các loại Message Queue khác vẫn chưa được kiểm định khả năng tích hợp.
-
-### WebSocket:
-
-Đang phát triển...
