@@ -9,7 +9,6 @@
     "cors": "^2.8.1",
     "express": "^4.14.0",
     "glob": "^7.1.1",
-    "glob-promise": "^2.0.0",
     "helmet": "^3.1.0",
     "method-override": "^2.3.7",
     "path": "^0.12.7",
