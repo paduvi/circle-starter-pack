@@ -7,9 +7,13 @@
 var Sequelize = require('sequelize');
 var Promise = require('bluebird');
 
-module.exports = function (app) {
+exports.beforeInitialize = function (app) {
     return connectPostgres(app);
 };
+
+exports.afterInitialize = function (app) {
+    return;
+}
 
 function connectPostgres(app) {
     return Promise.resolve().then(function () {
