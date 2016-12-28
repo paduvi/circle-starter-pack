@@ -1,5 +1,4 @@
 const DataTypes = require('sequelize');
-var schemaScript = require('../../script/schema');
 
 module.exports = function (sequelize) {
     let Book = sequelize.define("book", {
@@ -17,10 +16,6 @@ module.exports = function (sequelize) {
         tableName: 'book',
         schema: 'item',
         timestamps: false
-    });
-
-    Book.sync().then(function () {
-        return sequelize.query(schemaScript.inherit('item.book', 'item.item'));
     });
 
     return Book
