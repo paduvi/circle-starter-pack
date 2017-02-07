@@ -1,7 +1,7 @@
 {
   "name": "circle-starter-pack",
   "version": "1.0.0",
-  "description": "core framework for micro-service",
+  "description": "starter pack for circlejs - micro-service framework",
   "main": "server.js",
   "dependencies": {
     "bluebird": "^3.4.6",
@@ -9,15 +9,17 @@
     "circlejs": "*",
     "express": "^4.14.0",
     "helmet": "^3.1.0",
+    "lodash": "^4.17.4",
     "method-override": "^2.3.7",
+    "passport-jwt": "^2.2.1",
     "pg": "^6.1.0",
     "sequelize": "^3.27.0",
     "winston": "^2.3.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "nodemon server-dev.js",
-    "run": "node server.js"
+    "test": "nodemon server.js",
+    "run": "NODE_ENV=production node server.js"
   },
   "repository": "https://github.com/paduvi/circle-starter-pack.git",
   "author": "paduvi",

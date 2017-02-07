@@ -20,7 +20,9 @@ module.exports = {
     },
     web: {
         port: 8000,
-        prefix: '/api'
+        prefix: '/api',
+        path: 'web',
+        passport: true // default: false
     },
     seneca: {
         type: 'http',

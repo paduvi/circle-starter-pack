@@ -7,6 +7,20 @@
 module.exports = function (application) {
     var fashionHandler = require('./handler/index')(application);
     return {
+        "/test": {
+            get: {
+                handler: function (req, res) {
+                    res.json(req.user);
+                },
+                middleware: [],
+                authenticate: {
+                    name: 'jwt',
+                    permissions: ['fashion_manage_all'],
+                    // options: {}
+                },
+                cors: 'chotoxautinh.com'
+            }
+        },
         "/": {
             get: {
                 handler: fashionHandler.findItem,
