@@ -9,12 +9,12 @@ const users = [
         id: 1,
         username: 'paduvi',
         password: '123456',
-        permissions: ['fashion_manage_all', 'test']
+        permissions: ['item_manage', 'permission_name']
     }, {
         id: 2,
         username: 'chotoxautinh',
         password: '123456',
-        permissions: ['test']
+        permissions: ['permission_name']
     }
 ]
 

@@ -1,17 +1,14 @@
 /**
  * Created by chotoxautinh on 12/27/16.
  */
-module.exports = function (app) {
-    app.use(logErrors)
-    app.use(clientErrorHandler)
-    app.use(errorHandler)
+module.exports = (app) => {
 
-    function logErrors(err, req, res, next) {
+    const logErrors = (err, req, res, next) => {
         app.logger.error(err.stack)
         next(err)
     }
 
-    function clientErrorHandler(err, req, res, next) {
+    const clientErrorHandler = (err, req, res, next) => {
         if (req.xhr) {
             res.status(500).send({error: 'Something failed!'})
         } else {
@@ -19,7 +16,7 @@ module.exports = function (app) {
         }
     }
 
-    function errorHandler(err, req, res, next) {
+    const errorHandler = (err, req, res) => {
         /* render HTML error page
          res.status(500)
          res.render('error', { error: err })
@@ -27,4 +24,8 @@ module.exports = function (app) {
 
         res.status(500).send({error: 'Something failed!'})
     }
+
+    app.use(logErrors)
+    app.use(clientErrorHandler)
+    app.use(errorHandler)
 }

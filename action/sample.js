@@ -2,59 +2,46 @@
  * Created by hailp on 11/24/16.
  */
 
-"use strict";
+const _ = require('lodash');
+const uuid = require('uuid');
 
-module.exports = function (app) {
+var samples = [];
 
-    let sample = app.db.sequelize.models.sample;
+module.exports = (app) => {
 
     return {
-        findSample: function (msg, done) {
-            return sample.findAndCountAll(msg.options).then(function (result) {
-                return done(null, result);
-            }).catch(function (err) {
-                return done(err);
-            })
+        findSample: ({offset, limit}, done) => {
+            done(null, samples.slice(offset, offset + limit))
         },
 
-        findSampleById: function (msg, done) {
-            return sample.findById(msg.id).then(function (result) {
-                done(null, result);
-            }).catch(function (err) {
-                done(err);
-            });
+        findSampleById: ({id}, done) => {
+            done(null, _.find(samples, {id}));
         },
 
-        createSample: function (msg, done) {
-            return sample.create(msg.payload).then(function (result) {
-                return done(null, result);
-            }).catch(function (err) {
-                return done(err);
-            })
+        createSample: ({payload}, done) => {
+            const result = {
+                id: uuid.v4(),
+                ...payload
+            }
+            samples.push(result);
+            return done(null, result);
         },
 
-        updateSample: function (msg, done) {
-            return sample.update(msg.payload, {
-                where: {
-                    id: msg.id
-                }
-            }).then(function (result) {
-                return done(null, result);
-            }).catch(function (err) {
-                return done(err);
-            })
+        updateSample: ({id, payload}, done) => {
+            const sample = _.find(samples, {id});
+            if (!sample)
+                return done(null);
+            const index = _.indexOf(samples, sample);
+
+            // Replace item at index using native splice
+            const result = {...sample, ...payload}
+            samples.splice(index, 1, result);
+
+            return done(null, result);
         },
 
-        deleteSample: function (msg, done) {
-            return sample.destroy({
-                where: {
-                    id: msg.id
-                }
-            }).then(function (result) {
-                return done(null, result);
-            }).catch(function (err) {
-                return done(err);
-            })
+        deleteSample: ({id}, done) => {
+            done(null, _.remove(samples, (sample) => sample.id === id));
         }
     }
 };

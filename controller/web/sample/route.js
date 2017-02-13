@@ -4,15 +4,16 @@
 
 "use strict";
 
-module.exports = function (application) {
-    var sampleHandler = require('./handler/index')(application);
+module.exports = (application) => {
+    const sampleHandler = require('./handler')(application);
+
     return {
         "/": {
             get: {
                 handler: sampleHandler.findSample,
             }
         },
-        "/:id([0-9]+)": {
+        "/:id": {
             get: {
                 handler: sampleHandler.findSampleById,
             },
@@ -23,17 +24,29 @@ module.exports = function (application) {
                 handler: sampleHandler.deleteSample,
             }
         },
-        "/cors/:id([0-9]+)": {
-            get: {
-                handler: sampleHandler.findSampleById,
-                middleware: [], // optional
-                cors: '113.190.102.155'
-            }
-        },
         "/create": {
             post: {
                 handler: sampleHandler.createSample,
             }
-        }
+        },
+        "/cors/:id([0-9]+)": {
+            get: {
+                handler: sampleHandler.findSampleById,
+                middleware: [], // optional
+                cors: 'chotoxautinh.com'
+            }
+        },
+        "/auth/test": {
+            get: {
+                handler: function (req, res) {
+                    res.json(req.user);
+                },
+                authenticate: {
+                    name: 'jwt',
+                    permissions: ['item_manage'],
+                    // options: {}
+                },
+            }
+        },
     }
 };
