@@ -14,8 +14,7 @@ module.exports = (app) => (
             const results = await app.seneca.exec({
                 role: 'sample', cmd: 'findSample', limit: limit, offset: offset
             });
-            return res.jsonp({
-                status: 200,
+            return res.status(200).jsonp({
                 message: "Danh sách dữ liệu sample",
                 data: results
             })
@@ -26,14 +25,12 @@ module.exports = (app) => (
                 role: 'sample', cmd: 'findSampleById', id: req.params.id
             });
             if (result)
-                return res.jsonp({
-                    status: 200,
+                return res.status(200).jsonp({
                     message: "Thông tin của sample",
                     data: result
                 })
 
-            return res.jsonp({
-                status: 401,
+            return res.status(400).jsonp({
                 message: "Không tìm thấy sample với ID " + req.params.id
             })
         },
@@ -46,8 +43,7 @@ module.exports = (app) => (
                     type: req.body.type
                 }
             })
-            return res.jsonp({
-                status: 201,
+            return res.status(201).jsonp({
                 message: "Thêm mới dữ liệu thành công",
                 data: result
             })
@@ -63,13 +59,11 @@ module.exports = (app) => (
                 }
             })
             if (result)
-                return res.jsonp({
-                    status: 200,
+                return res.status(200).jsonp({
                     message: "Cập nhật thông tin bản ghi thành công!",
                     data: result
                 })
-            return res.jsonp({
-                status: 401,
+            return res.status(400).jsonp({
                 message: "Không tìm thấy sample với ID " + req.params.id
             })
         },
@@ -79,13 +73,11 @@ module.exports = (app) => (
                 role: 'sample', cmd: 'deleteSample', id: req.params.id
             })
             if (result)
-                return res.jsonp({
-                    status: 200,
+                return res.status(200).jsonp({
                     message: "Bản ghi đã được xóa thành công!",
                     data: result
                 })
-            return res.jsonp({
-                status: 201,
+            return res.status(201).jsonp({
                 message: "Không tìm thấy bản ghi này hoặc đã được xóa trước đó!"
             })
         }

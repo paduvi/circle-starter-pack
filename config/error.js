@@ -6,8 +6,8 @@ import path from 'path';
 module.exports = (app) => {
 
     const notFoundHandler = (req, res) => {
-        if (req.xhr) {
-            res.status(404).send("Sorry can't find that!")
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            res.status(404).jsonp({error: "Sorry can't find that!"})
         } else {
             res.sendFile(path.resolve(__dirname, '../static/404.html'));
         }
@@ -19,8 +19,8 @@ module.exports = (app) => {
     }
 
     const clientErrorHandler = (err, req, res, next) => {
-        if (req.xhr) {
-            res.status(500).send({error: 'Something failed!'})
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            res.status(500).jsonp({error: 'Something failed!'})
         } else {
             next(err)
         }

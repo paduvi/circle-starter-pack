@@ -25,9 +25,7 @@ const jwtOptions = {};
 jwtOptions.jwtFromRequest = ExtractJwt.versionOneCompatibility({authScheme: 'Bearer'});
 jwtOptions.secretOrKey = 'a corgi dog';
 
-module.exports = (app) => new JwtStrategy(jwtOptions, (jwt_payload, next) => {
-    let id = jwt_payload.id;
-
+module.exports = (app) => new JwtStrategy(jwtOptions, ({id}, next) => {
     const user = _.find(users, {id});
     if (!user)
         return next('User not found');
