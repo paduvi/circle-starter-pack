@@ -25,7 +25,6 @@
     "test": "nodemon server.js",
     "run": "NODE_ENV=production node server.js"
   },
-  "repository": "https://github.com/paduvi/circle-starter-pack.git",
   "author": "paduvi",
   "license": "ISC"
 }

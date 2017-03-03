@@ -20,7 +20,6 @@
     "winston": "^2.3.0"
   },
   "devDependencies": {},
-  "repository": "https://github.com/paduvi/circle-zmq-starter-pack.git",
   "scripts": {
     "test": "nodemon server.js",
     "run": "NODE_ENV=production node server.js"
